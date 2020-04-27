@@ -2,21 +2,17 @@
 #include <string.h>
 #include <math.h>
 
-#define S 3
+#define SIZE 256
 
 
 
 int main()
 {
-	char alf[S] = "abc";
-	char arr[S] = "abc";	
-	
-	for(int i=0;i<S;i++)
+	unsigned char n = 'D';
+	for(int j=0;j<SIZE;j++)
 	{
-		for(int j=0;j<S;j++)
-		{
-			printf("%i\n", strcmp(&alf[i], &alf[j]));
-		}
+		if(j==n)
+			printf("%i", j);
 	}
 	
 	return 0;
