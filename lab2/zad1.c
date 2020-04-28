@@ -66,7 +66,7 @@ int main()
 	*/
 	
 	fptr2 = fopen("input.txt", "rb"); 
-	output = fopen("archive.txt", "w"); 
+	output = fopen("archive.bin", "w"); 
 	if (output == NULL) 
 	{ 
 		printf("Cannot open file \n"); 
@@ -148,7 +148,7 @@ int main()
 	fclose(output);
 	
 	FILE* fdecode;
-	fdecode = fopen("archive.txt", "rb"); 
+	fdecode = fopen("archive.bin", "rb"); 
 	
 	long long int decode_size = -1;
 	uchar decode_buff[8];
@@ -237,8 +237,8 @@ float decode_float(uchar buf[4])
 	return f1;	
 }
 
-void encode_float(float n, uchar bytes_temp[4])
+void encode_float(float n, uchar buf[4])
 { 
-	memcpy(bytes_temp, (uchar*) (&n), 4);
+	memcpy(buf, (uchar*) (&n), 4);
 	return;
 }
