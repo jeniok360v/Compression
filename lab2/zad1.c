@@ -7,6 +7,18 @@
 #define SIZE 256
 #define ALFABET 10
 
+typedef unsigned long long int ullint;
+typedef unsigned char uchar;
+
+
+void encode_lli(ullint n, uchar buf[8]);
+ullint decode_lli(uchar buf[8]);
+
+float decode_float(uchar buf[4]);
+void encode_float(float n, uchar buf[4]);
+
+
+
 int main()
 {
 	FILE* output; 
@@ -21,7 +33,7 @@ int main()
 	}	
 	
 	long long int size=0;
-	unsigned char buffer = 0;
+	uchar buffer = 0;
 	int n;
 	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
 	{
@@ -60,6 +72,10 @@ int main()
 		printf("Cannot open file \n"); 
 		exit(0); 
 	}
+	uchar buf[8];
+	ullint die = 2575327;
+	encode_lli(die, buf);
+	fwrite(buf, sizeof(buf), 1, output);
 	
 	float l = 0;
 	float p = 1;	
@@ -90,36 +106,36 @@ int main()
 		l = l+F[c]*d;
 		z = (l+p)/2;
 		printf("d:%f, l:%f, p:%f, z:%f, F[%i]:%f, F[%i]:%f\n", d, l, p, z, c, F[c], c+1, F[c+1]);
-		int licznik = 0;
+		int counter = 0;
 		while(true)
 		{
 			//printf("d:%f, l:%f, p:%f, z:%f\n", d, l, p, z);
 			if(l>=0 && p<=0.5)
 			{
 				fprintf(output, "0");
-				for(int cs=0;cs<licznik;cs++)
+				for(int i=0;i<counter;i++)
 				{
 					fprintf(output, "1");
 				}
 				//printf("case 1\n");
 				l=2*l;
 				p=2*p;
-				licznik=0;
+				counter=0;
 			}
 			else if(l>=0.5 && p<=1)
 			{
 				fprintf(output, "1");
-				for(int cs=0;cs<licznik;cs++)
+				for(int i=0;i<counter;i++)
 				{
 					fprintf(output, "0");
 				}
 				l=2*l-1;
 				p=2*p-1;	
-				licznik=0;
+				counter=0;
 			}
 			else if(l>=0.25 && p<=0.75)
 			{
-				licznik+=1;
+				counter+=1;
 				l=2*l-0.5;				
 				p=2*p-0.5;	
 			}
@@ -130,6 +146,29 @@ int main()
 		//printf("arr[%i]:%c, d:%f, l:%f, p:%f, z:%f\n",i, arr[i], d, l, p, z);
 	}	
 	fclose(output);
+	
+	FILE* fdecode;
+	fdecode = fopen("archive.txt", "rb"); 
+	
+	long long int decode_size = -1;
+	uchar decode_buff[8];
+	//fread(&decode_buff, 8, 1, fdecode);
+	fread(decode_buff, sizeof(decode_buff), 1, fdecode);
+	for(int i=0;i<8;i++)
+	{
+		printf("%i: %c(%i)\n", i, decode_buff[i], decode_buff[i]);
+	}	
+	decode_size = decode_lli(decode_buff);	
+	printf("lli: %lli\n", decode_size);
+	
+
+	//sprintf(decode_buff, "%08lli", decode_size);
+	//sscanf(decode_buff, "%08lli", &decode_size);
+	
+	//printf("size decode: %lli\n", decode_size);
+	fclose(fdecode);
+	
+	
 	/*
 	char out[S] = "";
 	l=0; p=1; int c;
@@ -171,6 +210,35 @@ int main()
 }
 
 
+void encode_lli(ullint n, uchar buf[8])
+{
+	for(int i=0;i<8;i++)
+	{
+		buf[7-i] = n%256;
+		n /= 256;
+	}
+}
 
+ullint decode_lli(uchar buf[8])
+{
+	ullint n = 0;
+	ullint temp = 1;
+	for(int i=0;i<8;i++)
+	{
+		n += (buf[7-i])*temp;
+		temp*=256;
+	}
+	return n;
+}
 
+float decode_float(uchar buf[4])
+{
+	float f1 = *(float*)(buf);
+	return f1;	
+}
 
+void encode_float(float n, uchar bytes_temp[4])
+{ 
+	memcpy(bytes_temp, (uchar*) (&n), 4);
+	return;
+}
