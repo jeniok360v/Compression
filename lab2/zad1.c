@@ -32,7 +32,7 @@ int main()
 		exit(0); 
 	}	
 	
-	long long int size=0;
+	ullint size=0;
 	uchar buffer = 0;
 	int n;
 	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
@@ -72,10 +72,20 @@ int main()
 		printf("Cannot open file \n"); 
 		exit(0); 
 	}
-	uchar buf[8];
+	
+	uchar buf[sizeof(ullint)];
 	ullint die = 2575327;
 	encode_lli(die, buf);
 	fwrite(buf, sizeof(buf), 1, output);
+	
+	uchar buf2[sizeof(float)] = {0};
+	for(int i=0;i<SIZE;i++)
+	{
+		encode_float(F[i+1], buf2);
+		fwrite(buf2, sizeof(buf2), 1, output);
+	}
+	
+	
 	
 	float l = 0;
 	float p = 1;	
@@ -150,7 +160,7 @@ int main()
 	FILE* fdecode;
 	fdecode = fopen("archive.bin", "rb"); 
 	
-	long long int decode_size = -1;
+	ullint decode_size = -1;
 	uchar decode_buff[8];
 	//fread(&decode_buff, 8, 1, fdecode);
 	fread(decode_buff, sizeof(decode_buff), 1, fdecode);
@@ -161,7 +171,22 @@ int main()
 	decode_size = decode_lli(decode_buff);	
 	printf("lli: %lli\n", decode_size);
 	
-
+	
+	float F2[SIZE+1] = {0};
+	uchar decode_buff2[sizeof(float)] = {0};
+	for(int i=0;i<SIZE;i++)
+	{
+		fread(decode_buff2, sizeof(decode_buff2), 1, fdecode);
+		F2[i+1] = decode_float(decode_buff2);
+	}
+	/*
+	for(int i=0;i<SIZE+1;i++)
+	{
+		printf("F2[%i]: %f\n", i, F2[i]);
+	}	
+	*/
+	
+	
 	//sprintf(decode_buff, "%08lli", decode_size);
 	//sscanf(decode_buff, "%08lli", &decode_size);
 	
