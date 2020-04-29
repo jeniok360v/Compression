@@ -40,11 +40,12 @@ int main()
 		F2[i+1] = decode_float(decode_buff2);
 	}
 	
+	/*
 	for(int i=0;i<SIZE+1;i++)
 	{
 		printf("F2[%i]: %f\n", i, F2[i]);
 	}	
-	
+	*/
 	fclose(fdecode);	
 	
 	return 0;

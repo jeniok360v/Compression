@@ -9,6 +9,14 @@
 typedef unsigned long long int ullint;
 typedef unsigned char uchar;
 
+int min(int a, int b)
+{
+	if(a>b)
+		return b;
+	return a;
+}
+
+int first_bits(int amount[SIZE], ullint size);
 
 void encode_lli(ullint n, uchar buf[8]);
 void encode_float(float n, uchar buf[4]);
@@ -18,10 +26,11 @@ void encode_float(float n, uchar buf[4]);
 int main()
 {
 	FILE* output; 
+	FILE* copy; 
 	FILE* fptr2;
 	int amount[SIZE]={0};
 	float probability[SIZE]={0.0};
-	fptr2 = fopen("input.txt", "rb"); 
+	fptr2 = fopen("bible.txt", "rb"); 
 	if (fptr2 == NULL) 
 	{ 
 		printf("Cannot open file \n"); 
@@ -36,6 +45,8 @@ int main()
 		amount[(int)buffer]++;
 		size++;
 	}
+
+	
 	fclose(fptr2);
 	
 	float F[SIZE+1];	//prawdopodobienstwo
@@ -60,14 +71,17 @@ int main()
 		}
 	}
 	*/
-	
-	fptr2 = fopen("input.txt", "rb"); 
+	fptr2 = fopen("bible.txt", "rb"); 
 	output = fopen("archive.bin", "w"); 
+	copy = fopen("copy.txt", "w"); 
 	if (output == NULL) 
 	{ 
 		printf("Cannot open file \n"); 
 		exit(0); 
 	}
+	
+	int fb = first_bits(amount, size);
+	printf("%i first bits\n", fb);
 	
 	uchar buf[sizeof(ullint)];
 	ullint die = 2575327;
@@ -83,82 +97,53 @@ int main()
 	
 	
 	
-	float l = 0;
-	float p = 1;	
-	float d;
-	float z;
+	double l = 0;
+	double p = 1;	
+	double d;
+	double z;
+	int licz = 0;
 	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
 	{
-		
-		//printf("g");
+		fprintf(copy, "%c", buffer);
 		int c;
-		//printf("arr[%i] %c\n", i, arr[i]);
 		for(int j=0;j<SIZE;j++)
 		{
-			//printf("j");
-			//printf("arr[%i] %c\n", j, alf[j]);
-			//printf("%i strcmp(%c, %c)\n", strcmp(&alf[j], &arr[i]), alf[j], arr[i]);
 			if(j==buffer)
 			{
-				//printf("l");
 				c = j;
 				break;
 			}
-			//printf("j");
 		}
-		//printf("\nl:%f, p:%f\n", l, p);
 		d = p-l;
 		p = l+F[c+1]*d;
 		l = l+F[c]*d;
 		z = (l+p)/2;
-		printf("d:%f, l:%f, p:%f, z:%f, F[%i]:%f, F[%i]:%f\n", d, l, p, z, c, F[c], c+1, F[c+1]);
-		int counter = 0;
+		//printf("licz:%i, l:%f, p:%f, z:%f, F[%i]:%f, F[%i]:%f\n", licz, l, p, z, c, F[c], c+1, F[c+1]);
+		//int counter = 0;
 		while(true)
 		{
-			//printf("d:%f, l:%f, p:%f, z:%f\n", d, l, p, z);
-			if(l>=0 && p<=0.5)
+			if(l>=0 && p<0.5f)
 			{
-				fprintf(output, "0");
-				for(int i=0;i<counter;i++)
-				{
-					fprintf(output, "1");
-				}
-				//printf("case 1\n");
+				fprintf(output, "m");// 0
+				//printf("2");
+
 				l=2*l;
 				p=2*p;
-				counter=0;
+				//counter=0;
 			}
-			else if(l>=0.5 && p<=1)
+			else if(l>=0.5f && p<1.0f)
 			{
-				fprintf(output, "1");
-				for(int i=0;i<counter;i++)
-				{
-					fprintf(output, "0");
-				}
+				fprintf(output, "u");//1
+				//printf("3");
 				l=2*l-1;
 				p=2*p-1;	
-				counter=0;
-			}
-			else if(l>=0.25 && p<=0.75)
-			{
-				counter+=1;
-				l=2*l-0.5;				
-				p=2*p-0.5;	
 			}
 			else 
 				break;			
 		}
-		//printf("~\n");
-		//printf("arr[%i]:%c, d:%f, l:%f, p:%f, z:%f\n",i, arr[i], d, l, p, z);
+		licz++;
 	}	
 	fclose(output);
-	
-	
-	//sprintf(decode_buff, "%08lli", decode_size);
-	//sscanf(decode_buff, "%08lli", &decode_size);
-	
-	//printf("size decode: %lli\n", decode_size);
-	
 	
 	
 	/*
@@ -201,6 +186,19 @@ int main()
 	return 0;
 }
 
+
+int first_bits(int amount[SIZE], ullint size)
+{
+	int minimal = 2147483647;
+	for(int i=0;i<SIZE;i++)
+	{
+		if(amount[i]>0)
+		{
+			minimal = min(minimal, amount[i]);
+		}
+	}
+	return ceil(log2(size)-log2(minimal));	
+}
 
 void encode_lli(ullint n, uchar buf[8])
 {
