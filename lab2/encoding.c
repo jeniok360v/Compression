@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 #define SIZE 256
+#define MAX_SIZE_IN_BYTES 1073741824	//pow(2,30), 1024MB
+#define SIZE_IN_BYTES 134217728	//pow(2,27), 128MB
 
 typedef unsigned long long int ullint;
 typedef unsigned char uchar;
@@ -23,8 +25,12 @@ void encode_float(float n, uchar buf[4]);
 
 
 
+
 int main()
 {
+	uchar* file_bytes = (char*)malloc(SIZE_IN_BYTES*sizeof(char));
+	uchar* file_bits = (char*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
+	
 	FILE* output; 
 	FILE* copy; 
 	FILE* fptr2;
@@ -102,9 +108,10 @@ int main()
 	double d;
 	double z;
 	int licz = 0;
+	int counter = 0;
 	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
 	{
-		fprintf(copy, "%c", buffer);
+		//fprintf(copy, "%c", buffer);
 		int c;
 		for(int j=0;j<SIZE;j++)
 		{
@@ -124,7 +131,9 @@ int main()
 		{
 			if(l>=0 && p<0.5f)
 			{
-				fprintf(output, "m");// 0
+				file_bits[counter] = '0';
+				counter++;
+				//fprintf(output, "0");// 0
 				//printf("2");
 
 				l=2*l;
@@ -133,7 +142,9 @@ int main()
 			}
 			else if(l>=0.5f && p<1.0f)
 			{
-				fprintf(output, "u");//1
+				file_bits[counter] = '1';
+				counter++;
+				//fprintf(output, "1");//1
 				//printf("3");
 				l=2*l-1;
 				p=2*p-1;	
@@ -143,9 +154,45 @@ int main()
 		}
 		licz++;
 	}	
-	fclose(output);
 	
 	
+	uchar buf3[20] = {0};
+	int byte_counter = counter/8;
+	for(int i=0;i<byte_counter;i++)
+	{
+		char data[8];
+		memcpy(data, file_bits+(8*i), 8);
+		char c = strtol(data, 0, 2);
+		file_bytes[i] = c;
+	}
+	
+	int last_fragment = counter%8;
+	
+	if(last_fragment)
+	{
+		char data[last_fragment];
+		memcpy(data, file_bits+(byte_counter*8), last_fragment);
+		char zeros[8-last_fragment];
+		for(int i=0;i<8-last_fragment;i++)
+			zeros[i]='0';		
+		
+		char* total = malloc(8*sizeof(char));
+		memcpy(total, data, last_fragment*sizeof(char));
+		memcpy(total+last_fragment, zeros, (8-last_fragment)*sizeof(char));
+		for(int i=0;i<8;i++)
+			printf("%c", total[i]);
+		
+		char c = strtol(total, 0, 2);
+		file_bytes[byte_counter] = c;
+	}
+	printf("\ncounter: %i\n", counter%8);
+	
+	
+	fwrite(file_bytes, sizeof(char), (byte_counter+1)*sizeof(char), output);
+	
+	
+	fclose(output);	
+	fclose(copy);
 	/*
 	char out[S] = "";
 	l=0; p=1; int c;
@@ -214,3 +261,7 @@ void encode_float(float n, uchar buf[4])
 	memcpy(buf, (uchar*) (&n), 4);
 	return;
 }
+
+
+
+
