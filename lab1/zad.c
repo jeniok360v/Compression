@@ -5,6 +5,7 @@
 
 #define SIZE 256
 
+
 float calculate_entr(int arr[SIZE], long int amount);
 float calculate_cond_entr(int arr[SIZE][SIZE], int ilosc[SIZE], long int amount);
 
@@ -60,7 +61,21 @@ int main(int argc, char* argv[])
 	{
 		p_wo[i]=(float)ilosc[i]/(float)amount;
 	}
-	
+
+
+
+	double product = 0;
+	int shet = 0;
+	for(int i=0;i<SIZE;i++)
+	{
+		if(ilosc[i]>0)
+		{
+			product = product+log2(ilosc[i]);
+			shet++;
+		}
+	}
+	long long int bajty = ceil((float)shet*(float)log2(amount)-product);
+	printf("bites for arithmetic coding: %lli\n", bajty);
 	
 	ilosc[(int)buffer0]--;	//skrajne przypadki
 	ilosc[0]++;	
@@ -79,7 +94,7 @@ int main(int argc, char* argv[])
 	{
 		if(ilosc[i]>0)
 		{
-			printf("p(%3d): %f\n", i, p_wo[i]);
+			//printf("p(%3d): %f\n", i, p_wo[i]);
 		}
 	}
 
@@ -89,7 +104,7 @@ int main(int argc, char* argv[])
 		{
 			if(ilosc_war[i][j]>0)
 			{
-				printf("p(%3d|%3d): %f\n", j, i, p_wo_war[i][j]);
+				//printf("p(%3d|%3d): %f\n", j, i, p_wo_war[i][j]);
 			}
 		}
 	}
