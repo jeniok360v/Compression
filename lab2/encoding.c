@@ -37,7 +37,6 @@ int main()
 	FILE* copy; 
 	FILE* fptr2;
 	int amount[SIZE]={0};
-	float probability[SIZE]={0.0};
 	fptr2 = fopen("bible.txt", "rb"); 
 	if (fptr2 == NULL) 
 	{ 
@@ -65,12 +64,12 @@ int main()
 		F[i+1]+=F[i];
 	}
 	
-	/*
+	
 	for(int i=0;i<SIZE+1;i++)
 	{
 		printf("F[%i]: %f\n", i, F[i]);
 	}
-	
+	/*
 	for(int i=0;i<SIZE;i++)
 	{
 		if(amount[i]>0)
@@ -92,8 +91,8 @@ int main()
 	printf("%i first bits\n", fb);
 	
 	uchar buf[sizeof(ullint)];
-	ullint die = 2575327;
-	encode_lli(die, buf);
+	//ullint die = 2575327;
+	encode_lli(size, buf);
 	fwrite(buf, sizeof(buf), 1, output);
 	
 	uchar buf2[sizeof(int)] = {0};
@@ -194,13 +193,13 @@ int main()
 		char* total = malloc(8*sizeof(char));
 		memcpy(total, data, last_fragment*sizeof(char));
 		memcpy(total+last_fragment, zeros, (8-last_fragment)*sizeof(char));
-		for(int i=0;i<8;i++)
-			printf("%c", total[i]);
+		//for(int i=0;i<8;i++)
+		//	printf("%c", total[i]);
 		
 		char c = strtol(total, 0, 2);
 		file_bytes[byte_counter] = c;
 	}
-	printf("\ncounter: %i\n", counter%8);
+	//printf("\ncounter: %i\n", counter%8);
 	
 	
 	fwrite(file_bytes, sizeof(char), (byte_counter+1)*sizeof(char), output);
@@ -245,7 +244,8 @@ int main()
 	
 	
 	
-	
+	free(file_bits);
+	free(file_bytes);
 	return 0;
 }
 

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #define SIZE 256
+#define SIZE_IN_BYTES 134217728	//pow(2,27), 128MB	(Maksymalny rozmiar pliku)
 
 typedef unsigned long long int ullint;
 typedef unsigned char uchar;
@@ -19,44 +20,52 @@ int decode_int(unsigned char buf[4]);
 
 int main()
 {
+	uchar* file_bytes = (char*)malloc(SIZE_IN_BYTES*sizeof(char));
+	uchar* file_bits = (char*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
+	
 	FILE* fdecode;
 	fdecode = fopen("archive.bin", "rb"); 
 	
-	ullint decode_size = -1;
+	ullint size = 0;
 	uchar decode_buff[8];
-	//fread(&decode_buff, 8, 1, fdecode);
-	fread(decode_buff, sizeof(decode_buff), 1, fdecode);
-	for(int i=0;i<8;i++)
-	{
-		printf("%i: %c(%i)\n", i, decode_buff[i], decode_buff[i]);
-	}	
-	decode_size = decode_lli(decode_buff);	
-	printf("lli: %lli\n", decode_size);
+	fread(decode_buff, sizeof(decode_buff), 1, fdecode);	
+	size = decode_lli(decode_buff);	
+	printf("lli: %lli\n", size);
 	
 	
-	float F2[SIZE+1] = {0};
+	
 	int amount[SIZE] = {0};
 	uchar decode_buff2[sizeof(int)] = {0};
 	for(int i=0;i<SIZE;i++)
 	{
 		fread(decode_buff2, sizeof(decode_buff2), 1, fdecode);
-		//F2[i+1] = decode_float(decode_buff2);
 		amount[i] = decode_int(decode_buff2);
+	}
+	
+
+	float F[SIZE+1];	//prawdopodobienstwo
+	F[0]=0;
+	for(int i=0;i<SIZE;i++)
+	{
+		F[i+1]=(float)amount[i]/(float)size;
+		F[i+1]+=F[i];
 	}
 	
 	/*
 	for(int i=0;i<SIZE+1;i++)
 	{
-		printf("F2[%i]: %f\n", i, F2[i]);
+		printf("F[%i]: %f\n", i, F[i]);
 	}	
-	*/
 	
+	/*
 	for(int i=0;i<SIZE;i++)
 	{
 		if(amount[i]>0)
 		printf("amount[%i]: %i\n", i, amount[i]);
 	}	
-	
+	*/
+	free(file_bytes);
+	free(file_bits);
 	fclose(fdecode);	
 	
 	return 0;
