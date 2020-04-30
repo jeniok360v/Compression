@@ -6,9 +6,10 @@
 
 #define SIZE 256
 #define MAX_SIZE_IN_BYTES 1073741824	//pow(2,30), 1024MB
-#define SIZE_IN_BYTES 134217728	//pow(2,27), 128MB
+#define SIZE_IN_BYTES 134217728	//pow(2,27), 128MB	(Maksymalny rozmiar pliku)
 
 typedef unsigned long long int ullint;
+typedef unsigned long int ulint;
 typedef unsigned char uchar;
 
 int min(int a, int b)
@@ -22,7 +23,8 @@ int first_bits(int amount[SIZE], ullint size);
 
 void encode_lli(ullint n, uchar buf[8]);
 void encode_float(float n, uchar buf[4]);
-
+void encode_ulint(ulint n, uchar buf[4]);
+void encode_int(int n, uchar buf[4]);
 
 
 
@@ -78,8 +80,8 @@ int main()
 	}
 	*/
 	fptr2 = fopen("bible.txt", "rb"); 
-	output = fopen("archive.bin", "w"); 
-	copy = fopen("copy.txt", "w"); 
+	output = fopen("archive.bin", "wb"); 
+	copy = fopen("copy.txt", "wb"); 
 	if (output == NULL) 
 	{ 
 		printf("Cannot open file \n"); 
@@ -94,13 +96,26 @@ int main()
 	encode_lli(die, buf);
 	fwrite(buf, sizeof(buf), 1, output);
 	
-	uchar buf2[sizeof(float)] = {0};
+	uchar buf2[sizeof(int)] = {0};
 	for(int i=0;i<SIZE;i++)
 	{
-		encode_float(F[i+1], buf2);
-		fwrite(buf2, sizeof(buf2), 1, output);
+		//encode_float(F[i+1], buf2);
+		encode_int(amount[i], buf2);
+		fwrite(buf2, 4, 1, output);
+		if(amount[i]>0)
+		{
+			for(int k=0;k<4;k++)
+			printf("amount[%i]: %i(%x)\n", i, amount[i], buf2[k]);
+			printf("\n");
+		}
+		memset(buf2, 0, 4);
 	}
 	
+	for(int i=0;i<SIZE;i++)
+	{
+		
+		
+	}	
 	
 	
 	double l = 0;
@@ -193,6 +208,7 @@ int main()
 	
 	fclose(output);	
 	fclose(copy);
+	
 	/*
 	char out[S] = "";
 	l=0; p=1; int c;
@@ -262,6 +278,16 @@ void encode_float(float n, uchar buf[4])
 	return;
 }
 
+void encode_ulint(ulint n, uchar buf[4])
+{ 
+	memcpy(buf, (uchar*) (&n), 4);
+	return;
+}
 
+void encode_int(int n, uchar buf[4])
+{ 
+	memcpy(buf, (uchar*) (&n), 4);
+	return;
+}
 
 
