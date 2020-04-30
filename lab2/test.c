@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
+#include <stdlib.h>
 #define SIZE 256
 
 typedef unsigned char uchar;
@@ -17,7 +17,15 @@ ulint decode_ulint(unsigned char buf[4]);
 
 int main()
 {
-	printf("sizeof:%i\n", sizeof(unsigned long int));
+	uchar buffer = 'a';
+	char c[8];	
+	itoa(buffer, c, 2);
+	for(int i=0;i<8;i++)
+	{
+		printf("%c",c[i]);
+	}
+	printf("\n\n\n");	
+
 	FILE* f;
 	f = fopen("f.txt", "wb"); 
 	

@@ -37,7 +37,7 @@ int main()
 	FILE* copy; 
 	FILE* fptr2;
 	int amount[SIZE]={0};
-	fptr2 = fopen("bible.txt", "rb"); 
+	fptr2 = fopen("input.txt", "rb"); 
 	if (fptr2 == NULL) 
 	{ 
 		printf("Cannot open file \n"); 
@@ -67,7 +67,7 @@ int main()
 	
 	for(int i=0;i<SIZE+1;i++)
 	{
-		printf("F[%i]: %f\n", i, F[i]);
+		//printf("F[%i]: %f\n", i, F[i]);
 	}
 	/*
 	for(int i=0;i<SIZE;i++)
@@ -78,7 +78,7 @@ int main()
 		}
 	}
 	*/
-	fptr2 = fopen("bible.txt", "rb"); 
+	fptr2 = fopen("input.txt", "rb"); 
 	output = fopen("archive.bin", "wb"); 
 	copy = fopen("copy.txt", "wb"); 
 	if (output == NULL) 
@@ -103,9 +103,9 @@ int main()
 		fwrite(buf2, 4, 1, output);
 		if(amount[i]>0)
 		{
-			for(int k=0;k<4;k++)
-			printf("amount[%i]: %i(%x)\n", i, amount[i], buf2[k]);
-			printf("\n");
+			//for(int k=0;k<4;k++)
+			//printf("amount[%i]: %i(%x)\n", i, amount[i], buf2[k]);
+			//printf("\n");
 		}
 		memset(buf2, 0, 4);
 	}
@@ -147,8 +147,8 @@ int main()
 			{
 				file_bits[counter] = '0';
 				counter++;
-				//fprintf(output, "0");// 0
-				//printf("2");
+				fprintf(copy, "0");// 0
+				printf("0");
 
 				l=2*l;
 				p=2*p;
@@ -158,8 +158,8 @@ int main()
 			{
 				file_bits[counter] = '1';
 				counter++;
-				//fprintf(output, "1");//1
-				//printf("3");
+				fprintf(copy, "1");//1
+				printf("1");
 				l=2*l-1;
 				p=2*p-1;	
 			}
@@ -169,8 +169,7 @@ int main()
 		licz++;
 	}	
 	
-	
-	uchar buf3[20] = {0};
+
 	int byte_counter = counter/8;
 	for(int i=0;i<byte_counter;i++)
 	{

@@ -23,22 +23,22 @@ int main()
 	uchar* file_bytes = (char*)malloc(SIZE_IN_BYTES*sizeof(char));
 	uchar* file_bits = (char*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
 	
-	FILE* fdecode;
-	fdecode = fopen("archive.bin", "rb"); 
+	// open archive.bin
+	FILE* archive;
+	archive = fopen("archive.bin", "rb"); 
 	
+	//size - number of charachters
 	ullint size = 0;
 	uchar decode_buff[8];
-	fread(decode_buff, sizeof(decode_buff), 1, fdecode);	
+	fread(decode_buff, sizeof(decode_buff), 1, archive);	
 	size = decode_lli(decode_buff);	
-	printf("lli: %lli\n", size);
 	
-	
-	
+	//number of every character
 	int amount[SIZE] = {0};
 	uchar decode_buff2[sizeof(int)] = {0};
 	for(int i=0;i<SIZE;i++)
 	{
-		fread(decode_buff2, sizeof(decode_buff2), 1, fdecode);
+		fread(decode_buff2, sizeof(decode_buff2), 1, archive);
 		amount[i] = decode_int(decode_buff2);
 	}
 	
@@ -50,6 +50,21 @@ int main()
 		F[i+1]=(float)amount[i]/(float)size;
 		F[i+1]+=F[i];
 	}
+	
+	uchar buffer = 0;
+	char c[8];
+	int n;
+	int byte_counter = 0;
+	while((n = fread(&buffer, 1, 1, archive)) != 0)
+	{  
+		for(int i=0;i<8;i++)
+		{
+			c[i] = ((buffer & (1 << (7-i))) ? '1' : '0');
+		}
+		memcpy(file_bits+(8*byte_counter), c, 8);
+		byte_counter++;
+	}
+	
 	
 	/*
 	for(int i=0;i<SIZE+1;i++)
@@ -66,7 +81,7 @@ int main()
 	*/
 	free(file_bytes);
 	free(file_bits);
-	fclose(fdecode);	
+	fclose(archive);	
 	
 	return 0;
 }
