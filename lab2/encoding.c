@@ -12,14 +12,6 @@ typedef unsigned long long int ullint;
 typedef unsigned long int ulint;
 typedef unsigned char uchar;
 
-int min(int a, int b)
-{
-	if(a>b)
-		return b;
-	return a;
-}
-
-int first_bits(int amount[SIZE], ullint size);
 
 void encode_lli(ullint n, uchar buf[8]);
 void encode_float(float n, uchar buf[4]);
@@ -28,8 +20,13 @@ void encode_int(int n, uchar buf[4]);
 
 
 
-int main()
+int main(int argc, char* argv[])
 {
+	if(argc != 2)
+	{
+		printf("Prosze podac nazwe pliku wejsciowego!\n");
+		return 0;		
+	}
 	uchar* file_bytes = (char*)malloc(SIZE_IN_BYTES*sizeof(char));
 	uchar* file_bits = (char*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
 	
@@ -37,7 +34,7 @@ int main()
 	FILE* copy; 
 	FILE* fptr2;
 	int amount[SIZE]={0};
-	fptr2 = fopen("input.txt", "rb"); 
+	fptr2 = fopen(argv[1], "rb"); 
 	if (fptr2 == NULL) 
 	{ 
 		printf("Cannot open file \n"); 
@@ -56,18 +53,19 @@ int main()
 	
 	fclose(fptr2);
 	
-	float F[SIZE+1];	//prawdopodobienstwo
+	double F[SIZE+1];	//prawdopodobienstwo
 	F[0]=0;
 	for(int i=0;i<SIZE;i++)
 	{
-		F[i+1]=(float)amount[i]/(float)size;
+		F[i+1]=(double)amount[i]/(double)size;
 		F[i+1]+=F[i];
 	}
 	
 	
 	for(int i=0;i<SIZE+1;i++)
 	{
-		//printf("F[%i]: %f\n", i, F[i]);
+		if(amount[i]>0)
+		printf("F[%i]: %f\n", i, F[i]);
 	}
 	/*
 	for(int i=0;i<SIZE;i++)
@@ -78,7 +76,7 @@ int main()
 		}
 	}
 	*/
-	fptr2 = fopen("input.txt", "rb"); 
+	fptr2 = fopen(argv[1], "rb"); 
 	output = fopen("archive.bin", "wb"); 
 	copy = fopen("copy.txt", "wb"); 
 	if (output == NULL) 
@@ -86,10 +84,7 @@ int main()
 		printf("Cannot open file \n"); 
 		exit(0); 
 	}
-	
-	int fb = first_bits(amount, size);
-	printf("%i first bits\n", fb);
-	
+		
 	uchar buf[sizeof(ullint)];
 	//ullint die = 2575327;
 	encode_lli(size, buf);
@@ -98,25 +93,11 @@ int main()
 	uchar buf2[sizeof(int)] = {0};
 	for(int i=0;i<SIZE;i++)
 	{
-		//encode_float(F[i+1], buf2);
 		encode_int(amount[i], buf2);
 		fwrite(buf2, 4, 1, output);
-		if(amount[i]>0)
-		{
-			//for(int k=0;k<4;k++)
-			//printf("amount[%i]: %i(%x)\n", i, amount[i], buf2[k]);
-			//printf("\n");
-		}
-		memset(buf2, 0, 4);
+		memset(buf2, 0, 4);	//to delete
 	}
-	
-	for(int i=0;i<SIZE;i++)
-	{
 		
-		
-	}	
-	
-	
 	double l = 0;
 	double p = 1;	
 	double d;
@@ -139,16 +120,17 @@ int main()
 		p = l+F[c+1]*d;
 		l = l+F[c]*d;
 		z = (l+p)/2;
-		//printf("licz:%i, l:%f, p:%f, z:%f, F[%i]:%f, F[%i]:%f\n", licz, l, p, z, c, F[c], c+1, F[c+1]);
+		
 		//int counter = 0;
 		while(true)
 		{
+			//printf("licz:%i, l:%f, p:%f, z:%f, F[%i]:%f, F[%i]:%f\n", licz, l, p, z, c, F[c], c+1, F[c+1]);
 			if(l>=0 && p<0.5f)
 			{
 				file_bits[counter] = '0';
 				counter++;
-				fprintf(copy, "0");// 0
-				printf("0");
+				//fprintf(copy, "0");// 0
+				//printf("0");
 
 				l=2*l;
 				p=2*p;
@@ -158,8 +140,8 @@ int main()
 			{
 				file_bits[counter] = '1';
 				counter++;
-				fprintf(copy, "1");//1
-				printf("1");
+				//fprintf(copy, "1");//1
+				//printf("1");
 				l=2*l-1;
 				p=2*p-1;	
 			}
@@ -198,11 +180,7 @@ int main()
 		char c = strtol(total, 0, 2);
 		file_bytes[byte_counter] = c;
 	}
-	//printf("\ncounter: %i\n", counter%8);
-	
-	
 	fwrite(file_bytes, sizeof(char), (byte_counter+1)*sizeof(char), output);
-	
 	
 	fclose(output);	
 	fclose(copy);
@@ -241,26 +219,11 @@ int main()
 	printf("%s\n", out);
 	*/
 	
-	
-	
 	free(file_bits);
 	free(file_bytes);
 	return 0;
 }
 
-
-int first_bits(int amount[SIZE], ullint size)
-{
-	int minimal = 2147483647;
-	for(int i=0;i<SIZE;i++)
-	{
-		if(amount[i]>0)
-		{
-			minimal = min(minimal, amount[i]);
-		}
-	}
-	return ceil(log2(size)-log2(minimal));	
-}
 
 void encode_lli(ullint n, uchar buf[8])
 {
