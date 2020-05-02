@@ -27,8 +27,8 @@ int main(int argc, char* argv[])
 		printf("Prosze podac nazwe pliku wejsciowego!\n");
 		return 0;		
 	}
-	uchar* file_bytes = (char*)malloc(SIZE_IN_BYTES*sizeof(char));
-	uchar* file_bits = (char*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
+	uchar* file_bytes = (uchar*)malloc(SIZE_IN_BYTES*sizeof(char));
+	uchar* file_bits = (uchar*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
 	
 	FILE* output; 
 	FILE* copy; 
@@ -101,9 +101,9 @@ int main(int argc, char* argv[])
 	double l = 0;
 	double p = 1;	
 	double d;
-	double z;
 	int licz = 0;
 	int counter = 0;
+	int licznik = 0;
 	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
 	{
 		//fprintf(copy, "%c", buffer);
@@ -119,32 +119,49 @@ int main(int argc, char* argv[])
 		d = p-l;
 		p = l+F[c+1]*d;
 		l = l+F[c]*d;
-		z = (l+p)/2;
 		
 		//int counter = 0;
 		while(true)
 		{
-			//printf("licz:%i, l:%f, p:%f, z:%f, F[%i]:%f, F[%i]:%f\n", licz, l, p, z, c, F[c], c+1, F[c+1]);
+			//printf("licz:%i, l:%f, p:%f, F[%i]:%f, F[%i]:%f\n", licz, l, p, c, F[c], c+1, F[c+1]);
 			if(l>=0 && p<0.5f)
 			{
 				file_bits[counter] = '0';
 				counter++;
+				//for(int i=0;i<licznik;i++)
+				//{
+				//	file_bits[counter] = '1';
+				//	counter++;
+				//}
+				
 				//fprintf(copy, "0");// 0
 				//printf("0");
 
 				l=2*l;
 				p=2*p;
-				//counter=0;
+				//licznik=0;
 			}
 			else if(l>=0.5f && p<1.0f)
 			{
 				file_bits[counter] = '1';
 				counter++;
+				//for(int i=0;i<licznik;i++)
+				//{
+				//	file_bits[counter] = '0';
+				//	counter++;
+				//}
 				//fprintf(copy, "1");//1
 				//printf("1");
 				l=2*l-1;
-				p=2*p-1;	
+				p=2*p-1;
+				//licznik = 0;
 			}
+			//else if(0.25<=l && l<0.5 && 0.5<p && p<0.75)
+			//{
+			//	l=2*l-0.5;
+			//	p=2*p-0.5;
+				//licznik++;
+			//}
 			else 
 				break;			
 		}

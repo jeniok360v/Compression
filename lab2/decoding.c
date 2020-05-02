@@ -34,8 +34,7 @@ int main(int argc, char* argv[])
 		printf("Prosze podac nazwe pliku wyjsciowego!\n");
 		return 0;
 	}
-	uchar* file_bytes = (char*)malloc(SIZE_IN_BYTES*sizeof(char));
-	uchar* file_bits = (char*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
+	uchar* file_bits = (uchar*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
 	
 	// open archive.bin
 	FILE* archive;
@@ -73,7 +72,7 @@ int main(int argc, char* argv[])
 	//printf("%i first bits\n", np);	
 	
 	uchar buffer = 0;
-	char c[8];
+	uchar c[8];
 	int n;
 	int byte_counter = 0;
 	while((n = fread(&buffer, 1, 1, archive)) != 0)
@@ -105,6 +104,9 @@ int main(int argc, char* argv[])
 	printf("np: %i\n", np);
 	int position = 0;
 	double tag = 0;
+	int licznik = 0;
+			
+	
 	for(int i=0;i<size;i++)
 	{
 		//printf("\n~~~~next letter~~~~~~\n");
@@ -113,17 +115,20 @@ int main(int argc, char* argv[])
 		diff = upper-lower;		
 		//printf("diff %lf\n", diff);
 		tag = binseq2double(file_bits, position, np);
-
+		//printf("%i\n", i);
 		for(int k=0;k<SIZE;k++)
 		{
 			double lower_tmp = lower+F[k]*diff;			
-			double upper_tmp = lower+F[k+1]*diff;
-			//printf("%i\n", k);
+			double upper_tmp = lower+F[k+1]*diff;	
+			if(i==1000)
+			{
+				printf("%i: [l: %lf, u: %lf](F[%i]:%f, F[%i]:%f) position: %i, tag: %lf\n", k, lower_tmp, upper_tmp, k, F[k], k+1, F[k+1], position, tag);				
+			}
 			if(lower_tmp<=tag && tag<upper_tmp)
 			{
 				fprintf(output, "%c", k);
 				//printf("%c", k);
-				//printf("%c: [l: %lf, u: %lf](F[%i]:%f, F[%i]:%f)\n", k, lower_tmp, upper_tmp, k, F[k], k+1, F[k+1]);				
+				//printf("%c: [l: %lf, u: %lf](F[%i]:%f, F[%i]:%f) position: %i\n", k, lower_tmp, upper_tmp, k, F[k], k+1, F[k+1], position);				
 				while(true)
 				{
 					if(lower_tmp>=0 && upper_tmp<0.5)
@@ -133,15 +138,27 @@ int main(int argc, char* argv[])
 						upper_tmp *= 2;
 						//printf("rescale(1): [l: %lf, u: %lf]\n", lower_tmp, upper_tmp);			
 							
-						position++;
+						position+=1;
+						//position+=(licznik+1);
+						//licznik = 0;
 					}
 					else if(lower_tmp>=0.5 && upper_tmp<1.0)
 					{
 						lower_tmp = lower_tmp*2-1;
 						upper_tmp = upper_tmp*2-1;
 						//printf("rescale(2): [l: %lf, u: %lf]\n", lower_tmp, upper_tmp);		
-						position++;						
+						position+=1;
+						//position+=(licznik+1);
+						//licznik = 0;					
 					}
+					/*
+					else if(0.25<=lower_tmp && lower_tmp<0.5 && 0.5<upper_tmp && upper_tmp<0.75)
+					{
+						lower_tmp = lower_tmp*2-0.5;
+						upper_tmp = upper_tmp*2-0.5;	
+						licznik++;
+					}
+					*/
 					else 
 					{
 						lower = lower_tmp;
@@ -160,14 +177,13 @@ int main(int argc, char* argv[])
 		printf("F[%i]: %f\n", i, F[i]);
 	}	
 	
-	/*
+	
 	for(int i=0;i<SIZE;i++)
 	{
 		if(amount[i]>0)
 		printf("amount[%i]: %i\n", i, amount[i]);
 	}	
 	*/
-	free(file_bytes);
 	free(file_bits);
 	fclose(output);	
 	
@@ -184,7 +200,7 @@ int necessary_precision(int amount[SIZE], ullint size)
 			minimal = min(minimal, amount[i]);
 		}
 	}
-	return ceil(log2(size)-log2(minimal))+10;	
+	return ceil(log2(size)-log2(minimal))+7;	
 }
 
 double binseq2double(uchar* arr, int position, int length)
