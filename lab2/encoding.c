@@ -31,7 +31,6 @@ int main(int argc, char* argv[])
 	uchar* file_bits = (uchar*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
 	
 	FILE* output; 
-	FILE* copy; 
 	FILE* fptr2;
 	int amount[SIZE]={0};
 	fptr2 = fopen(argv[1], "rb"); 
@@ -49,8 +48,6 @@ int main(int argc, char* argv[])
 		amount[(int)buffer]++;
 		size++;
 	}
-
-	
 	fclose(fptr2);
 	
 	double F[SIZE+1];	//prawdopodobienstwo
@@ -60,25 +57,9 @@ int main(int argc, char* argv[])
 		F[i+1]=(double)amount[i]/(double)size;
 		F[i+1]+=F[i];
 	}
-	
-	
-	for(int i=0;i<SIZE+1;i++)
-	{
-		if(amount[i]>0)
-		printf("F[%i]: %f\n", i, F[i]);
-	}
-	/*
-	for(int i=0;i<SIZE;i++)
-	{
-		if(amount[i]>0)
-		{
-			printf("amount[%i]: %i\n", i, amount[i]);
-		}
-	}
-	*/
+
 	fptr2 = fopen(argv[1], "rb"); 
 	output = fopen("archive.bin", "wb"); 
-	copy = fopen("copy.txt", "wb"); 
 	if (output == NULL) 
 	{ 
 		printf("Cannot open file \n"); 
@@ -86,7 +67,6 @@ int main(int argc, char* argv[])
 	}
 		
 	uchar buf[sizeof(ullint)];
-	//ullint die = 2575327;
 	encode_lli(size, buf);
 	fwrite(buf, sizeof(buf), 1, output);
 	
@@ -98,15 +78,13 @@ int main(int argc, char* argv[])
 		memset(buf2, 0, 4);	//to delete
 	}
 		
-	double l = 0;
-	double p = 1;	
-	double d;
+	double lower = 0;
+	double upper = 1;	
+	double diff;
 	int licz = 0;
 	int counter = 0;
-	int licznik = 0;
 	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
 	{
-		//fprintf(copy, "%c", buffer);
 		int c;
 		for(int j=0;j<SIZE;j++)
 		{
@@ -116,52 +94,27 @@ int main(int argc, char* argv[])
 				break;
 			}
 		}
-		d = p-l;
-		p = l+F[c+1]*d;
-		l = l+F[c]*d;
+		diff = upper-lower;
+		upper = lower+F[c+1]*diff;
+		lower = lower+F[c]*diff;
 		
-		//int counter = 0;
 		while(true)
 		{
-			//printf("licz:%i, l:%f, p:%f, F[%i]:%f, F[%i]:%f\n", licz, l, p, c, F[c], c+1, F[c+1]);
-			if(l>=0 && p<0.5f)
+			//printf("licz:%i, lower:%f, upper:%f, F[%i]:%f, F[%i]:%f\n", licz, lower, upper, c, F[c], c+1, F[c+1]);
+			if(lower>=0 && upper<0.5f)
 			{
 				file_bits[counter] = '0';
 				counter++;
-				//for(int i=0;i<licznik;i++)
-				//{
-				//	file_bits[counter] = '1';
-				//	counter++;
-				//}
-				
-				//fprintf(copy, "0");// 0
-				//printf("0");
-
-				l=2*l;
-				p=2*p;
-				//licznik=0;
+				lower=2*lower;
+				upper=2*upper;
 			}
-			else if(l>=0.5f && p<1.0f)
+			else if(lower>=0.5f && upper<1.0f)
 			{
 				file_bits[counter] = '1';
 				counter++;
-				//for(int i=0;i<licznik;i++)
-				//{
-				//	file_bits[counter] = '0';
-				//	counter++;
-				//}
-				//fprintf(copy, "1");//1
-				//printf("1");
-				l=2*l-1;
-				p=2*p-1;
-				//licznik = 0;
+				lower=2*lower-1;
+				upper=2*upper-1;
 			}
-			//else if(0.25<=l && l<0.5 && 0.5<p && p<0.75)
-			//{
-			//	l=2*l-0.5;
-			//	p=2*p-0.5;
-				//licznik++;
-			//}
 			else 
 				break;			
 		}
@@ -179,7 +132,6 @@ int main(int argc, char* argv[])
 	}
 	
 	int last_fragment = counter%8;
-	
 	if(last_fragment)
 	{
 		char data[last_fragment];
@@ -197,45 +149,13 @@ int main(int argc, char* argv[])
 		char c = strtol(total, 0, 2);
 		file_bytes[byte_counter] = c;
 	}
+	else
+	{
+		file_bytes[byte_counter] = 0;	
+	}
 	fwrite(file_bytes, sizeof(char), (byte_counter+1)*sizeof(char), output);
 	
 	fclose(output);	
-	fclose(copy);
-	
-	/*
-	char out[S] = "";
-	l=0; p=1; int c;
-	for(int i=0;i<S;i++)
-	{
-		int j;
-		for(j=0;j<S;j++)
-		{
-			printf("(%f, %f)\n", l+F[j]*(p-l), l+F[j+1]*(p-l));
-		}
-		
-		for(int j=0;j<S;j++)
-		{
-			if(l+F[j]*(p-l)<=z && z<l+F[j+1]*(p-l))
-			{
-				c=j;
-				printf("(%f <= %f < %f), j==%i\n", l+F[j]*(p-l), z, l+F[j+1]*(p-l), j);
-				break;
-				
-			}
-		}	
-		
-		out[i]=alf[c];
-		printf("out[%i] = alf[%i]\n", i, c);
-		
-		d = p-l;
-		p = l+F[c+1]*d;
-		l = l+F[c]*d;
-			
-	}
-	printf("%c \n%c \n%c \n%c string\n", out[0], out[1], out[2], alf[0]);
-	printf("%s\n", out);
-	*/
-	
 	free(file_bits);
 	free(file_bytes);
 	return 0;
