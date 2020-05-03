@@ -5,7 +5,6 @@
 #include <stdlib.h>
 
 #define SIZE 256
-#define MAX_SIZE_IN_BYTES 1073741824	//pow(2,30), 1024MB
 #define SIZE_IN_BYTES 134217728	//pow(2,27), 128MB	(Maksymalny rozmiar pliku)
 
 typedef unsigned long long int ullint;
@@ -31,10 +30,10 @@ int main(int argc, char* argv[])
 	uchar* file_bits = (uchar*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
 	
 	FILE* output; 
-	FILE* fptr2;
+	FILE* input;
 	int amount[SIZE]={0};
-	fptr2 = fopen(argv[1], "rb"); 
-	if (fptr2 == NULL) 
+	input = fopen(argv[1], "rb"); 
+	if (input == NULL) 
 	{ 
 		printf("Cannot open file \n"); 
 		exit(0); 
@@ -43,15 +42,12 @@ int main(int argc, char* argv[])
 	ullint size=0;
 	uchar buffer = 0;
 	int n;
-	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
+	while((n = fread(&buffer, 1, 1, input)) != 0)
 	{
 		amount[(int)buffer]++;
 		size++;
 	}
-	fclose(fptr2);
-	
-	float entropy = calculate_entr(amount, size);
-	printf("entropia: %f\n", entropy);
+	fclose(input);
 	
 	double F[SIZE+1];	//prawdopodobienstwo
 	F[0]=0;
@@ -61,7 +57,7 @@ int main(int argc, char* argv[])
 		F[i+1]+=F[i];
 	}
 
-	fptr2 = fopen(argv[1], "rb"); 
+	input = fopen(argv[1], "rb"); 
 	output = fopen("archive.bin", "wb"); 
 	if (output == NULL) 
 	{ 
@@ -87,7 +83,7 @@ int main(int argc, char* argv[])
 	int licz = 0;
 	int counter = 0;
 	int licznik = 0;
-	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
+	while((n = fread(&buffer, 1, 1, input)) != 0)
 	{
 		int c;
 		for(int j=0;j<SIZE;j++)
@@ -102,8 +98,7 @@ int main(int argc, char* argv[])
 		upper = lower+F[c+1]*diff;
 		lower = lower+F[c]*diff;
 		while(true)
-		{
-			
+		{	
 			//printf("licz:%i, lower:%f, upper:%f, F[%i]:%f, F[%i]:%f\n", licz, lower, upper, c, F[c], c+1, F[c+1]);
 			if(lower>=0 && upper<0.5)
 			{
@@ -153,6 +148,7 @@ int main(int argc, char* argv[])
 		file_bytes[i] = c;
 	}
 	
+	// zera na koncu ostatniego bajtu
 	int last_fragment = counter%8;
 	if(last_fragment)
 	{
@@ -175,9 +171,18 @@ int main(int argc, char* argv[])
 	}
 	for(int i=0;i<4;i++)
 	{
+		//jeszcze kilka zerowych bajtow na samym koncu pliku
 		file_bytes[byte_counter+i] = 0;
 	}
 	fwrite(file_bytes, sizeof(char), (byte_counter+5)*sizeof(char), output);
+	
+	
+	float entropy = calculate_entr(amount, size);
+	printf("Entropia: %f\n", entropy);	
+	printf("Srednia liczba bitow na symbol(sam tekst) %lf\n", 8.0f*(float)(byte_counter+5)/(float)size);
+	printf("Srednia liczba bitow na symbol %lf\n", 8.0f*((float)(byte_counter+5)+sizeof(ullint)+256*sizeof(int))/(float)size);
+	printf("Stopien kompresji %lf\n",(float)size/((float)(byte_counter+5)+sizeof(ullint)+256*sizeof(int)));
+	
 	
 	fclose(output);	
 	free(file_bits);

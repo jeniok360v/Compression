@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
 	uchar c[8];
 	int n;
 	int byte_counter = 0;
+	//zamiana symboli ASCII na '0' i '1'
 	while((n = fread(&buffer, 1, 1, archive)) != 0)
 	{  
 		for(int i=0;i<8;i++)
@@ -89,10 +90,6 @@ int main(int argc, char* argv[])
 	FILE* output;
 	output = fopen(argv[1], "wb");	
 	
-	double lower = 0;
-	double upper = 1;
-	double diff;
-	
 	int np = necessary_precision(amount, size, PRECISION);
 	if(np>31)
 	{
@@ -100,7 +97,10 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	
-	np=31;
+	double lower = 0;
+	double upper = 1;
+	double diff;	
+	np=31;	//maksymalna precyzja
 	int position = 0;
 	double tag = binseq2double(file_bits, position, np);
 	int licznik = 0;
