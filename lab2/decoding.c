@@ -6,7 +6,7 @@
 
 #define SIZE 256
 #define SIZE_IN_BYTES 134217728	//pow(2,27), 128MB	(Maksymalny rozmiar pliku)
-#define PRECISION 3
+#define PRECISION 10
 
 int min(int a, int b)
 {
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 	double lower = 0;
 	double upper = 1;
 	double diff;	
-	np=31;	//maksymalna precyzja
+	//np=31;	//maksymalna precyzja
 	int position = 0;
 	double tag = binseq2double(file_bits, position, np);
 	int licznik = 0;
