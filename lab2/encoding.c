@@ -18,7 +18,7 @@ void encode_float(float n, uchar buf[4]);
 void encode_ulint(ulint n, uchar buf[4]);
 void encode_int(int n, uchar buf[4]);
 
-
+float calculate_entr(int ilosc[SIZE], ullint amount);
 
 int main(int argc, char* argv[])
 {
@@ -49,6 +49,9 @@ int main(int argc, char* argv[])
 		size++;
 	}
 	fclose(fptr2);
+	
+	float entropy = calculate_entr(amount, size);
+	printf("entropia: %f\n", entropy);
 	
 	double F[SIZE+1];	//prawdopodobienstwo
 	F[0]=0;
@@ -83,6 +86,7 @@ int main(int argc, char* argv[])
 	double diff = 1;
 	int licz = 0;
 	int counter = 0;
+	int licznik = 0;
 	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
 	{
 		int c;
@@ -94,30 +98,44 @@ int main(int argc, char* argv[])
 				break;
 			}
 		}
-		//if (licz<25) printf("before   %i: [l: %lf, u: %lf] \n", licz, lower, upper);
 		diff = upper-lower;
 		upper = lower+F[c+1]*diff;
 		lower = lower+F[c]*diff;
-		//if (licz==20) printf("bounds   %i: F[%i]:%f, F[%i]:%f \n", licz, c, F[c], c+1, F[c+1]);
-		//if (licz<25) printf("(%c)after %i: [l: %lf, u: %lf] \n", c, licz, lower, upper);
-		
 		while(true)
 		{
 			
 			//printf("licz:%i, lower:%f, upper:%f, F[%i]:%f, F[%i]:%f\n", licz, lower, upper, c, F[c], c+1, F[c+1]);
-			if(lower>=0 && upper<0.5f)
+			if(lower>=0 && upper<0.5)
 			{
 				file_bits[counter] = '0';
 				counter++;
-				lower=2*lower;
-				upper=2*upper;
+				for(int i=0;i<licznik;i++)
+				{
+					file_bits[counter] = '1';
+					counter++;				
+				}
+				lower=(double)2*lower;
+				upper=(double)2*upper;
+				licznik = 0;
 			}
-			else if(lower>=0.5f && upper<1.0f)
+			else if(lower>=0.5 && upper<1.0)
 			{
 				file_bits[counter] = '1';
 				counter++;
-				lower=2*lower-1;
-				upper=2*upper-1;
+				for(int i=0;i<licznik;i++)
+				{
+					file_bits[counter] = '0';
+					counter++;				
+				}
+				lower=(double)2*lower-(double)1;
+				upper=(double)2*upper-(double)1;
+				licznik = 0;
+			}
+			else if(lower>=0.25 && upper<0.75)
+			{
+				lower=(double)2*lower-(double)0.5;
+				upper=(double)2*upper-(double)0.5;				
+				licznik++;
 			}
 			else 
 				break;			
@@ -147,8 +165,6 @@ int main(int argc, char* argv[])
 		char* total = malloc(8*sizeof(char));
 		memcpy(total, data, last_fragment*sizeof(char));
 		memcpy(total+last_fragment, zeros, (8-last_fragment)*sizeof(char));
-		//for(int i=0;i<8;i++)
-		//	printf("%c", total[i]);
 		
 		char c = strtol(total, 0, 2);
 		file_bytes[byte_counter] = c;
@@ -197,4 +213,20 @@ void encode_int(int n, uchar buf[4])
 	return;
 }
 
-
+float calculate_entr(int ilosc[SIZE], ullint amount)	//amount to liczba bajtow
+{
+	float entropy=0;
+	if(amount>0)
+	{
+		for (int i=0; i<SIZE;i++)
+		{
+			if(ilosc[i]>0)
+			{
+				entropy += ilosc[i]*(log2(ilosc[i]));
+			}
+		}
+		entropy= -entropy/(float)amount;
+		entropy+=log2((float)amount);
+	}
+	return entropy;
+}

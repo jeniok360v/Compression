@@ -6,7 +6,7 @@
 
 #define SIZE 256
 #define SIZE_IN_BYTES 134217728	//pow(2,27), 128MB	(Maksymalny rozmiar pliku)
-#define PRECISION 10
+#define PRECISION 3
 
 int min(int a, int b)
 {
@@ -27,10 +27,14 @@ float decode_float(uchar buf[4]);
 ulint decode_ulint(unsigned char buf[4]);
 int decode_int(unsigned char buf[4]);
 
+double rescale1(double in);
+double rescale2(double in);
+double rescale3(double in);
+
 
 int main(int argc, char* argv[])
 {
-	if(argc != 3)
+	if(argc != 2)
 	{
 		printf("Prosze podac nazwe pliku wyjsciowego!\n");
 		return 0;
@@ -79,11 +83,6 @@ int main(int argc, char* argv[])
 		memcpy(file_bits+(8*byte_counter), c, 8);
 		byte_counter++;
 	}
-	for(int i=108;i<150;i++)
-	{
-		//printf("%c", file_bits[i]);
-	}
-	printf("\n");
 	fclose(archive);
 
 
@@ -94,8 +93,7 @@ int main(int argc, char* argv[])
 	double upper = 1;
 	double diff;
 	
-	int np = necessary_precision(amount, size, atoi(argv[2]));
-	printf("np: %i\n", np);
+	int np = necessary_precision(amount, size, PRECISION);
 	if(np>31)
 	{
 		printf("Za duza precyzja: %i bitow\n", np);
@@ -104,36 +102,42 @@ int main(int argc, char* argv[])
 	
 	np=31;
 	int position = 0;
-	double tag = 0;
+	double tag = binseq2double(file_bits, position, np);
+	int licznik = 0;
 	for(int i=0;i<size;i++)
 	{
-		//if(i>207320 && i<207327) printf("%d\n", i);
-		diff = upper-lower;		
-		tag = binseq2double(file_bits, position, np);
-		if(i>207230 && i<207237) printf("before:  %d: [l: %lf, u: %lf], tag: %lf, with prec: %.10lf, pos: %i\n", i, lower, upper, tag, tag, position);
+		diff = upper-lower;	
 		for(int k=0;k<SIZE;k++)
 		{
 			double lower_tmp = lower+F[k]*diff;			
-			double upper_tmp = lower+F[k+1]*diff;	
+			double upper_tmp = lower+F[k+1]*diff;
 			if(lower_tmp<=tag && tag<upper_tmp)
 			{
-				//printf(" ~~ ");
-				if(i>207230 && i<207237) printf("(%c)after %i: [l: %lf, u: %lf], tag: %lf, tag with preci: %.10lf\n", k, i, lower_tmp, upper_tmp, tag, tag);
 				fprintf(output, "%c", k);
-				//printf("%c: [l: %lf, u: %lf](F[%i]:%f, F[%i]:%f) position: %i\n", k, lower_tmp, upper_tmp, k, F[k], k+1, F[k+1], position);				
 				while(true)
 				{
 					if(lower_tmp>=0 && upper_tmp<0.5)
 					{
-						lower_tmp *= 2;
-						upper_tmp *= 2;
-						position+=1;
+						lower_tmp = rescale1(lower_tmp);
+						upper_tmp = rescale1(upper_tmp);
+						position = position+licznik+1;
+						licznik = 0;
+						tag = binseq2double(file_bits, position, np);
 					}
 					else if(lower_tmp>=0.5 && upper_tmp<1.0)
 					{
-						lower_tmp = lower_tmp*2-1;
-						upper_tmp = upper_tmp*2-1;	
-						position+=1;					
+						lower_tmp = rescale2(lower_tmp);
+						upper_tmp = rescale2(upper_tmp);	
+						position = position+licznik+1;
+						licznik = 0;
+						tag = binseq2double(file_bits, position, np);
+					}
+					else if(lower_tmp>=0.25 && upper_tmp<0.75)
+					{
+						lower_tmp = rescale3(lower_tmp);
+						upper_tmp = rescale3(upper_tmp);
+						tag = tag*2.0-0.5;
+						licznik++;
 					}
 					else 
 					{
@@ -206,3 +210,28 @@ int decode_int(unsigned char buf[4])
 {
 	return *(int*)(buf);
 }
+
+
+double rescale1(double in)
+{
+	double ret;
+	ret = in*(double)2.0;
+	return ret;
+}
+
+double rescale2(double in)
+{
+	double ret;
+	ret = in*(double)2.0-(double)1.0;
+	return ret;
+}
+
+double rescale3(double in)
+{
+	double ret;
+	ret = in*(double)2.0-(double)0.5;
+	return ret;	
+}
+
+
+
