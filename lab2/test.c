@@ -7,6 +7,7 @@
 typedef unsigned char uchar;
 typedef unsigned long int ulint;
 
+double binseq2double(uchar* arr, int position, int length);
 void encode_lli(unsigned long long int n, unsigned char buf[8]);
 unsigned long long int decode_lli(unsigned char buf[8]);
 
@@ -17,6 +18,11 @@ ulint decode_ulint(unsigned char buf[4]);
 
 int main()
 {
+	uchar* file_bits = (uchar*)malloc(32*sizeof(char)*8);
+	file_bits = "0101011010010101011";
+	printf("binseq: %lf\n\n", binseq2double(file_bits, 0, 19));
+	
+	
 	uchar buffer = 'a';
 	char c[8];	
 	itoa(buffer, c, 2);
@@ -24,7 +30,7 @@ int main()
 	{
 		printf("%c",c[i]);
 	}
-	printf("\n\n\n");	
+	printf("\n\n");	
 
 	FILE* f;
 	f = fopen("f.txt", "wb"); 
@@ -62,7 +68,19 @@ int main()
 	return 0;
 }
 
-
+double binseq2double(uchar* arr, int position, int length)
+{
+	double ret = 0.0;
+	int div = 2; 
+	int temp = 0;
+	for(int i=0;i<length;i++)
+	{
+		temp = (*(arr+position+i) == '0' ? 0 : 1);
+		ret += (double)temp/(double)div;
+		div *= 2;
+	}
+	return ret;
+}
 
 void encode_lli(unsigned long long int n, unsigned char buf[8])
 {

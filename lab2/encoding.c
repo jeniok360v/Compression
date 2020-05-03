@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 		
 	double lower = 0;
 	double upper = 1;	
-	double diff;
+	double diff = 1;
 	int licz = 0;
 	int counter = 0;
 	while((n = fread(&buffer, 1, 1, fptr2)) != 0)
@@ -94,12 +94,16 @@ int main(int argc, char* argv[])
 				break;
 			}
 		}
+		//if (licz<25) printf("before   %i: [l: %lf, u: %lf] \n", licz, lower, upper);
 		diff = upper-lower;
 		upper = lower+F[c+1]*diff;
 		lower = lower+F[c]*diff;
+		//if (licz==20) printf("bounds   %i: F[%i]:%f, F[%i]:%f \n", licz, c, F[c], c+1, F[c+1]);
+		//if (licz<25) printf("(%c)after %i: [l: %lf, u: %lf] \n", c, licz, lower, upper);
 		
 		while(true)
 		{
+			
 			//printf("licz:%i, lower:%f, upper:%f, F[%i]:%f, F[%i]:%f\n", licz, lower, upper, c, F[c], c+1, F[c+1]);
 			if(lower>=0 && upper<0.5f)
 			{
@@ -153,7 +157,11 @@ int main(int argc, char* argv[])
 	{
 		file_bytes[byte_counter] = 0;	
 	}
-	fwrite(file_bytes, sizeof(char), (byte_counter+1)*sizeof(char), output);
+	for(int i=0;i<4;i++)
+	{
+		file_bytes[byte_counter+i] = 0;
+	}
+	fwrite(file_bytes, sizeof(char), (byte_counter+5)*sizeof(char), output);
 	
 	fclose(output);	
 	free(file_bits);

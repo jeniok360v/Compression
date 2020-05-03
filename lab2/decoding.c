@@ -19,7 +19,7 @@ typedef unsigned long long int ullint;
 typedef unsigned char uchar;
 typedef unsigned long int ulint;
 
-int necessary_precision(int amount[SIZE], ullint size);
+int necessary_precision(int amount[SIZE], ullint size, int precision);
 double binseq2double(uchar* arr, int position, int length);
 
 ullint decode_lli(uchar buf[8]);
@@ -30,11 +30,12 @@ int decode_int(unsigned char buf[4]);
 
 int main(int argc, char* argv[])
 {
-	if(argc != 2)
+	if(argc != 3)
 	{
 		printf("Prosze podac nazwe pliku wyjsciowego!\n");
 		return 0;
 	}
+
 	uchar* file_bits = (uchar*)malloc(SIZE_IN_BYTES*sizeof(char)*8);
 	
 	// open archive.bin
@@ -78,6 +79,11 @@ int main(int argc, char* argv[])
 		memcpy(file_bits+(8*byte_counter), c, 8);
 		byte_counter++;
 	}
+	for(int i=108;i<150;i++)
+	{
+		//printf("%c", file_bits[i]);
+	}
+	printf("\n");
 	fclose(archive);
 
 
@@ -87,20 +93,32 @@ int main(int argc, char* argv[])
 	double lower = 0;
 	double upper = 1;
 	double diff;
-	int np = necessary_precision(amount, size);
+	
+	int np = necessary_precision(amount, size, atoi(argv[2]));
 	printf("np: %i\n", np);
+	if(np>31)
+	{
+		printf("Za duza precyzja: %i bitow\n", np);
+		return 0;
+	}
+	
+	np=31;
 	int position = 0;
 	double tag = 0;
 	for(int i=0;i<size;i++)
 	{
+		//if(i>207320 && i<207327) printf("%d\n", i);
 		diff = upper-lower;		
 		tag = binseq2double(file_bits, position, np);
+		if(i>207230 && i<207237) printf("before:  %d: [l: %lf, u: %lf], tag: %lf, with prec: %.10lf, pos: %i\n", i, lower, upper, tag, tag, position);
 		for(int k=0;k<SIZE;k++)
 		{
 			double lower_tmp = lower+F[k]*diff;			
 			double upper_tmp = lower+F[k+1]*diff;	
 			if(lower_tmp<=tag && tag<upper_tmp)
 			{
+				//printf(" ~~ ");
+				if(i>207230 && i<207237) printf("(%c)after %i: [l: %lf, u: %lf], tag: %lf, tag with preci: %.10lf\n", k, i, lower_tmp, upper_tmp, tag, tag);
 				fprintf(output, "%c", k);
 				//printf("%c: [l: %lf, u: %lf](F[%i]:%f, F[%i]:%f) position: %i\n", k, lower_tmp, upper_tmp, k, F[k], k+1, F[k+1], position);				
 				while(true)
@@ -133,7 +151,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-int necessary_precision(int amount[SIZE], ullint size)
+int necessary_precision(int amount[SIZE], ullint size, int precision)
 {
 	int minimal = 2147483647;
 	for(int i=0;i<SIZE;i++)
@@ -143,7 +161,7 @@ int necessary_precision(int amount[SIZE], ullint size)
 			minimal = min(minimal, amount[i]);
 		}
 	}
-	return ceil(log2(size)-log2(minimal))+PRECISION;	
+	return ceil(log2(size)-log2(minimal))+precision;	
 }
 
 double binseq2double(uchar* arr, int position, int length)
