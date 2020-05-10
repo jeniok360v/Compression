@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 		printf("Cannot open file \n"); 
 		exit(0); 
 	}	
-	
+	printf("h");
 	ullint size=0;
 	uchar buffer = 0;
 	int n;
@@ -56,7 +56,14 @@ int main(int argc, char* argv[])
 		F[i+1]=(double)amount[i]/(double)size;
 		F[i+1]+=F[i];
 	}
-
+	ullint f[SIZE+1];	//prawdopodobienstwo
+	f[0]=0;
+	for(int i=0;i<SIZE;i++)
+	{
+		f[i+1]=(ullint)amount[i];
+		f[i+1]+=f[i];
+	}
+	printf("h");
 	input = fopen(argv[1], "rb"); 
 	output = fopen("archive.bin", "wb"); 
 	if (output == NULL) 
@@ -64,25 +71,28 @@ int main(int argc, char* argv[])
 		printf("Cannot open file \n"); 
 		exit(0); 
 	}
-		
+	printf("h");	
 	uchar buf[sizeof(ullint)];
 	encode_lli(size, buf);
 	fwrite(buf, sizeof(buf), 1, output);
 	
 	uchar buf2[sizeof(int)] = {0};
-	for(int i=0;i<SIZE;i++)
+	for(int i=0;i<SIZE;i++)	//slownik (liczba wystapien kazdego z symboli)
 	{
 		encode_int(amount[i], buf2);
 		fwrite(buf2, 4, 1, output);
 		memset(buf2, 0, 4);	//to delete
 	}
-		
-	double lower = 0;
-	double upper = 1;	
-	double diff = 1;
+	ullint m = ceil(log2(size))+2;
+	ullint M = pow(2, m);
+	printf("h");
+	ullint lower = 0;
+	ullint upper = pow(2, m)-1;	
+	ullint diff = upper-lower+1;
 	int licz = 0;
 	int counter = 0;
 	int licznik = 0;
+	printf("h");
 	while((n = fread(&buffer, 1, 1, input)) != 0)
 	{
 		int c;
@@ -94,15 +104,19 @@ int main(int argc, char* argv[])
 				break;
 			}
 		}
+		//printf("h");
+		if(licz <90 ) printf("after  licz:%i, lower:%lli, upper:%lli (%i %c)\n", licz, lower, upper, c, c);
 		//if(licz <70 && licz>50) printf("before licz:%i, lower:%f, upper:%f (%i %c)\n", licz, lower, upper, c, c);
-		diff = upper-lower;
-		upper = lower+F[c+1]*diff;
-		lower = lower+F[c]*diff;
-		//if(licz <70 && licz>50) printf("after  licz:%i, lower:%f, upper:%f (%i %c)\n", licz, lower, upper, c, c);
+		diff = upper-lower+1;
+		upper = lower+floor((f[c+1]*diff)/size)-1;
+		lower = lower+floor((f[c]*diff)/size);
+		
 		while(true)
 		{	
+			//printf("%i ",c);
+			//printf("l: %lli u: %lli\n",lower , upper);
 			//if(licz <70 && licz>50) printf("licz:%i, lower:%f, upper:%f, F[%i]:%f, F[%i]:%f\n", licz, lower, upper, c, F[c], c+1, F[c+1]);
-			if(lower>=0 && upper<0.5)
+			if(lower>=0 && upper<M/2)
 			{
 				file_bits[counter] = '0';
 				counter++;
@@ -111,12 +125,12 @@ int main(int argc, char* argv[])
 					file_bits[counter] = '1';
 					counter++;				
 				}
-				lower=(double)2*lower;
-				upper=(double)2*upper;
+				lower=2*lower;
+				upper=2*upper;
 				licznik = 0;
 				//if(licz <70 && licz>50) printf("while1\n");
 			}
-			else if(lower>=0.5 && upper<1.0)
+			else if(lower>=M/2 && upper<M)
 			{
 				file_bits[counter] = '1';
 				counter++;
@@ -125,15 +139,15 @@ int main(int argc, char* argv[])
 					file_bits[counter] = '0';
 					counter++;				
 				}
-				lower=(double)2*lower-(double)1;
-				upper=(double)2*upper-(double)1;
+				lower=2*lower-M;
+				upper=2*upper-M;
 				licznik = 0;
 				//if(licz <70 && licz>50) printf("while2\n");
 			}
-			else if(lower>=0.25 && upper<0.75)
+			else if(lower>=M/4 && upper<3*M/4)
 			{
-				lower=(double)2*lower-(double)0.5;
-				upper=(double)2*upper-(double)0.5;				
+				lower=2*lower-M/2;
+				upper=2*upper-M/2;				
 				licznik++;
 				//if(licz <70 && licz>50) printf("while3\n");
 			}

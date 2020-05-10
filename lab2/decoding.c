@@ -21,6 +21,7 @@ typedef unsigned long int ulint;
 
 int necessary_precision(int amount[SIZE], ullint size, int precision);
 double binseq2double(uchar* arr, int position, int length);
+ullint binseq2ullint(uchar* arr, int position, int length, ullint M);
 
 ullint decode_lli(uchar buf[8]);
 float decode_float(uchar buf[4]);
@@ -70,6 +71,14 @@ int main(int argc, char* argv[])
 		F[i+1]+=F[i];
 	}	
 	
+	ullint f[SIZE+1];	//prawdopodobienstwo
+	f[0]=0;
+	for(int i=0;i<SIZE;i++)
+	{
+		f[i+1]=(ullint)amount[i];
+		f[i+1]+=f[i];
+	}
+	
 	uchar buffer = 0;
 	uchar c[8];
 	int n;
@@ -96,54 +105,60 @@ int main(int argc, char* argv[])
 		printf("Za duza precyzja: %i bitow\n", np);
 		return 0;
 	}
+	ullint m = ceil(log2(size))+2;
+	ullint M = pow(2, m);	
+	printf("M: %lli, m: %lli\n", M, m);
 	
-	double lower = 0;
-	double upper = 1;
-	double diff;	
+	
+	ullint lower = 0;
+	ullint upper = M-1;
+	ullint diff = M;	
 	np=31;	//maksymalna precyzja
 	int position = 0;
-	double tag = binseq2double(file_bits, position, np);
+	ullint tag = binseq2ullint(file_bits, position, np, M);
 	int licznik = 0;
 	for(int i=0;i<size;i++)
 	{
-		diff = upper-lower;	
+		diff = upper-lower+1;	
 		for(int k=0;k<SIZE;k++)
 		{
-			double lower_tmp = lower+F[k]*diff;			
-			double upper_tmp = lower+F[k+1]*diff;
-			if(lower_tmp<=tag && tag<upper_tmp)
+			ullint lower_tmp = lower+floor((f[k]*diff)/size);		
+			ullint upper_tmp = lower+floor((f[k+1]*diff)/size)-1;
+			
+			if(lower_tmp<=tag && (long long int)tag<(long long int)upper_tmp)
 			{
-				if(i > 55 && i < 65) for(int h=position;h<position+32;h++) printf("%c", file_bits[h]);
-				printf("licz:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
+				//if(i > 55 && i < 65) for(int h=position;h<position+32;h++) printf("%c", file_bits[h]);
+				printf("licz:%i, lower:%lli, upper:%lli, tag %lli\n", i, lower_tmp, upper_tmp, tag);
 				fprintf(output, "%c", k);
+				printf("%c",k);
 				while(true)
 				{
-					if(lower_tmp>=0 && upper_tmp<0.5)
+					if(lower_tmp>=0 && upper_tmp<M/2)
 					{
 						
-						lower_tmp = rescale1(lower_tmp);
-						upper_tmp = rescale1(upper_tmp);
+						lower_tmp *= 2;
+						upper_tmp *= 2;
 						position = position+licznik+1;
 						licznik = 0;
-						tag = binseq2double(file_bits, position, np);
-						printf("1:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
+						tag = binseq2ullint(file_bits, position, np, M);
+						//printf("1:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
 					}
-					else if(lower_tmp>=0.5 && upper_tmp<1.0)
+					else if(lower_tmp>=M/2 && upper_tmp<M)
 					{
-						lower_tmp = rescale2(lower_tmp);
-						upper_tmp = rescale2(upper_tmp);	
+						lower_tmp = lower_tmp*2-M;
+						upper_tmp = upper_tmp*2-M;
 						position = position+licznik+1;
 						licznik = 0;
-						tag = binseq2double(file_bits, position, np);
-						printf("2:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
+						tag = binseq2ullint(file_bits, position, np, M);
+						//printf("2:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
 					}
-					else if(lower_tmp>=0.25 && upper_tmp<0.75)
+					else if(lower_tmp>=M/4 && upper_tmp<3*M/4)
 					{
-						lower_tmp = rescale3(lower_tmp);
-						upper_tmp = rescale3(upper_tmp);
-						tag = tag*2.0-0.5;
+						lower_tmp = lower_tmp*2-M/2;
+						upper_tmp = upper_tmp*2-M/2;
+						tag = tag*2-M/2;
 						licznik++;
-						printf("3:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
+						//printf("3:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
 					}
 					else 
 					{
@@ -186,6 +201,21 @@ double binseq2double(uchar* arr, int position, int length)
 		div *= 2;
 	}
 	return ret;
+}
+
+ullint binseq2ullint(uchar* arr, int position, int length, ullint M)
+{
+	double ret = 0.0;
+	int div = 2; 
+	int temp = 0;
+	for(int i=0;i<length;i++)
+	{
+		temp = (*(arr+position+i) == '0' ? 0 : 1);
+		ret += (double)temp/(double)div;
+		div *= 2;
+	}
+	ret*=(double)M;
+	return (ullint)ret;
 }
 
 ullint decode_lli(uchar buf[8])
