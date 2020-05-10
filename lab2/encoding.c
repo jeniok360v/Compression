@@ -94,12 +94,14 @@ int main(int argc, char* argv[])
 				break;
 			}
 		}
+		//if(licz <70 && licz>50) printf("before licz:%i, lower:%f, upper:%f (%i %c)\n", licz, lower, upper, c, c);
 		diff = upper-lower;
 		upper = lower+F[c+1]*diff;
 		lower = lower+F[c]*diff;
+		//if(licz <70 && licz>50) printf("after  licz:%i, lower:%f, upper:%f (%i %c)\n", licz, lower, upper, c, c);
 		while(true)
 		{	
-			//printf("licz:%i, lower:%f, upper:%f, F[%i]:%f, F[%i]:%f\n", licz, lower, upper, c, F[c], c+1, F[c+1]);
+			//if(licz <70 && licz>50) printf("licz:%i, lower:%f, upper:%f, F[%i]:%f, F[%i]:%f\n", licz, lower, upper, c, F[c], c+1, F[c+1]);
 			if(lower>=0 && upper<0.5)
 			{
 				file_bits[counter] = '0';
@@ -112,6 +114,7 @@ int main(int argc, char* argv[])
 				lower=(double)2*lower;
 				upper=(double)2*upper;
 				licznik = 0;
+				//if(licz <70 && licz>50) printf("while1\n");
 			}
 			else if(lower>=0.5 && upper<1.0)
 			{
@@ -125,12 +128,14 @@ int main(int argc, char* argv[])
 				lower=(double)2*lower-(double)1;
 				upper=(double)2*upper-(double)1;
 				licznik = 0;
+				//if(licz <70 && licz>50) printf("while2\n");
 			}
 			else if(lower>=0.25 && upper<0.75)
 			{
 				lower=(double)2*lower-(double)0.5;
 				upper=(double)2*upper-(double)0.5;				
 				licznik++;
+				//if(licz <70 && licz>50) printf("while3\n");
 			}
 			else 
 				break;			
@@ -177,6 +182,8 @@ int main(int argc, char* argv[])
 	fwrite(file_bytes, sizeof(char), (byte_counter+5)*sizeof(char), output);
 	
 	
+	printf("Liczba symboli %lli\n", size);
+	printf("m =  %lf\n", log2(size)+2.0);
 	float entropy = calculate_entr(amount, size);
 	printf("Entropia: %f\n", entropy);	
 	printf("Srednia liczba bitow na symbol(sam tekst) %lf\n", 8.0f*(float)(byte_counter+5)/(float)size);

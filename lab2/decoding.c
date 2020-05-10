@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 	double lower = 0;
 	double upper = 1;
 	double diff;	
-	//np=31;	//maksymalna precyzja
+	np=31;	//maksymalna precyzja
 	int position = 0;
 	double tag = binseq2double(file_bits, position, np);
 	int licznik = 0;
@@ -113,16 +113,20 @@ int main(int argc, char* argv[])
 			double upper_tmp = lower+F[k+1]*diff;
 			if(lower_tmp<=tag && tag<upper_tmp)
 			{
+				if(i > 55 && i < 65) for(int h=position;h<position+32;h++) printf("%c", file_bits[h]);
+				printf("licz:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
 				fprintf(output, "%c", k);
 				while(true)
 				{
 					if(lower_tmp>=0 && upper_tmp<0.5)
 					{
+						
 						lower_tmp = rescale1(lower_tmp);
 						upper_tmp = rescale1(upper_tmp);
 						position = position+licznik+1;
 						licznik = 0;
 						tag = binseq2double(file_bits, position, np);
+						printf("1:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
 					}
 					else if(lower_tmp>=0.5 && upper_tmp<1.0)
 					{
@@ -131,6 +135,7 @@ int main(int argc, char* argv[])
 						position = position+licznik+1;
 						licznik = 0;
 						tag = binseq2double(file_bits, position, np);
+						printf("2:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
 					}
 					else if(lower_tmp>=0.25 && upper_tmp<0.75)
 					{
@@ -138,6 +143,7 @@ int main(int argc, char* argv[])
 						upper_tmp = rescale3(upper_tmp);
 						tag = tag*2.0-0.5;
 						licznik++;
+						printf("3:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
 					}
 					else 
 					{
