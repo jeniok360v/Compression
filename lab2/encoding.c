@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 		printf("Cannot open file \n"); 
 		exit(0); 
 	}	
-	printf("h");
+	
 	ullint size=0;
 	uchar buffer = 0;
 	int n;
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 		f[i+1]=(ullint)amount[i];
 		f[i+1]+=f[i];
 	}
-	printf("h");
+	
 	input = fopen(argv[1], "rb"); 
 	output = fopen("archive.bin", "wb"); 
 	if (output == NULL) 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 		printf("Cannot open file \n"); 
 		exit(0); 
 	}
-	printf("h");	
+		
 	uchar buf[sizeof(ullint)];
 	encode_lli(size, buf);
 	fwrite(buf, sizeof(buf), 1, output);
@@ -85,14 +85,14 @@ int main(int argc, char* argv[])
 	}
 	ullint m = ceil(log2(size))+2;
 	ullint M = pow(2, m);
-	printf("h");
+	
 	ullint lower = 0;
 	ullint upper = pow(2, m)-1;	
 	ullint diff = upper-lower+1;
 	int licz = 0;
 	int counter = 0;
 	int licznik = 0;
-	printf("h");
+	
 	while((n = fread(&buffer, 1, 1, input)) != 0)
 	{
 		int c;
@@ -104,20 +104,14 @@ int main(int argc, char* argv[])
 				break;
 			}
 		}
-		//printf("h");
-		if(licz <1465 && licz >1455) printf("before licz:%i, lower:%lli, upper:%lli (%i %c)\n", licz, lower, upper, c, c);
+		
 		diff = upper-lower+1;
 		upper = lower+floor((f[c+1]*diff)/size)-1;
 		lower = lower+floor((f[c]*diff)/size);
-		if(licz <1465 && licz >1455) printf("after  licz:%i, lower:%lli, upper:%lli (%i %c)\n", licz, lower, upper, c, c);
 		
 		while(true)
 		{	
-			//printf("%i ",c);
-			//printf("l: %lli u: %lli\n",lower , upper);
 			ullint der = upper-lower+1;
-			if(licz <1465 && licz >1455) printf("licz:%i, lower:%lli, upper:%lli, F[%i]:%lli, F[%i]:%lli\n", licz, lower, upper, c, f[c], c+1, f[c+1]);
-			if(licz <1465 && licz >1455) printf("lower %lli, upper %lli\n", lower+(ullint)floor((f[c]*der)/size), lower+(ullint)floor((f[c+1]*der)/size)-1);
 			if(lower>=0 && upper<M/2)
 			{
 				file_bits[counter] = '0';
@@ -130,7 +124,6 @@ int main(int argc, char* argv[])
 				lower=2*lower;
 				upper=2*upper;
 				licznik = 0;
-				if(licz <1465 && licz >1455) printf("while1\n");
 			}
 			else if(lower>=M/2 && upper<M)
 			{
@@ -144,14 +137,12 @@ int main(int argc, char* argv[])
 				lower=2*lower-M;
 				upper=2*upper-M;
 				licznik = 0;
-				if(licz <1465 && licz >1455) printf("while2\n");
 			}
 			else if(lower>=M/4 && upper<3*M/4)
 			{
 				lower=2*lower-M/2;
 				upper=2*upper-M/2;				
 				licznik++;
-				if(licz <1465 && licz >1455) printf("while3\n");
 			}
 			else 
 				break;			
@@ -199,7 +190,6 @@ int main(int argc, char* argv[])
 	
 	
 	printf("Liczba symboli %lli\n", size);
-	printf("m =  %lf\n", log2(size)+2.0);
 	float entropy = calculate_entr(amount, size);
 	printf("Entropia: %f\n", entropy);	
 	printf("Srednia liczba bitow na symbol(sam tekst) %lf\n", 8.0f*(float)(byte_counter+5)/(float)size);
