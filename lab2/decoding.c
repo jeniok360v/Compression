@@ -6,7 +6,7 @@
 
 #define SIZE 256
 #define SIZE_IN_BYTES 134217728	//pow(2,27), 128MB	(Maksymalny rozmiar pliku)
-#define PRECISION 10
+#define PRECISION 3
 
 int min(int a, int b)
 {
@@ -18,6 +18,7 @@ int min(int a, int b)
 typedef unsigned long long int ullint;
 typedef unsigned char uchar;
 typedef unsigned long int ulint;
+typedef long long int llint;
 
 int necessary_precision(int amount[SIZE], ullint size, int precision);
 double binseq2double(uchar* arr, int position, int length);
@@ -113,9 +114,9 @@ int main(int argc, char* argv[])
 	ullint lower = 0;
 	ullint upper = M-1;
 	ullint diff = M;	
-	np=31;	//maksymalna precyzja
+	//np=31;	//maksymalna precyzja
 	int position = 0;
-	ullint tag = binseq2ullint(file_bits, position, np, M);
+	ullint tag = binseq2ullint(file_bits, position, np, m);
 	int licznik = 0;
 	for(int i=0;i<size;i++)
 	{
@@ -124,13 +125,14 @@ int main(int argc, char* argv[])
 		{
 			ullint lower_tmp = lower+floor((f[k]*diff)/size);		
 			ullint upper_tmp = lower+floor((f[k+1]*diff)/size)-1;
-			
-			if(lower_tmp<=tag && (long long int)tag<(long long int)upper_tmp)
+			if(i == 1458)printf("licz:%i, lower:%lli, upper:%lli, tag %lli(%i %c)\n", i, lower_tmp, upper_tmp, tag, k, k);
+			if(lower_tmp<=tag+1 && (llint)tag+1<(llint)upper_tmp)
 			{
 				//if(i > 55 && i < 65) for(int h=position;h<position+32;h++) printf("%c", file_bits[h]);
-				printf("licz:%i, lower:%lli, upper:%lli, tag %lli\n", i, lower_tmp, upper_tmp, tag);
+				
 				fprintf(output, "%c", k);
 				printf("%c",k);
+				printf("licz:%i, lower:%lli, upper:%lli, tag %lli\n", i, lower_tmp, upper_tmp, tag);
 				while(true)
 				{
 					if(lower_tmp>=0 && upper_tmp<M/2)
@@ -140,8 +142,8 @@ int main(int argc, char* argv[])
 						upper_tmp *= 2;
 						position = position+licznik+1;
 						licznik = 0;
-						tag = binseq2ullint(file_bits, position, np, M);
-						//printf("1:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
+						tag = binseq2ullint(file_bits, position, np, m);
+						printf("1:%i, lower:%lli, upper:%lli, tag %lli\n", i, lower_tmp, upper_tmp, tag);
 					}
 					else if(lower_tmp>=M/2 && upper_tmp<M)
 					{
@@ -149,8 +151,8 @@ int main(int argc, char* argv[])
 						upper_tmp = upper_tmp*2-M;
 						position = position+licznik+1;
 						licznik = 0;
-						tag = binseq2ullint(file_bits, position, np, M);
-						//printf("2:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
+						tag = binseq2ullint(file_bits, position, np, m);
+						printf("2:%i, lower:%lli, upper:%lli, tag %lli\n", i, lower_tmp, upper_tmp, tag);
 					}
 					else if(lower_tmp>=M/4 && upper_tmp<3*M/4)
 					{
@@ -158,7 +160,7 @@ int main(int argc, char* argv[])
 						upper_tmp = upper_tmp*2-M/2;
 						tag = tag*2-M/2;
 						licznik++;
-						//printf("3:%i, lower:%f, upper:%f, tag %lf\n", i, lower_tmp, upper_tmp, tag);
+						printf("3:%i, lower:%lli, upper:%lli, tag %lli\n", i, lower_tmp, upper_tmp, tag);
 					}
 					else 
 					{
@@ -203,18 +205,20 @@ double binseq2double(uchar* arr, int position, int length)
 	return ret;
 }
 
-ullint binseq2ullint(uchar* arr, int position, int length, ullint M)
+ullint binseq2ullint(uchar* arr, int position, int length, ullint m)
 {
-	double ret = 0.0;
+	ullint ret = 0;
+	int power = m-1;
 	int div = 2; 
 	int temp = 0;
 	for(int i=0;i<length;i++)
 	{
 		temp = (*(arr+position+i) == '0' ? 0 : 1);
-		ret += (double)temp/(double)div;
+		ret += (ullint)temp*(ullint)pow(2, power);
+		power--;
 		div *= 2;
 	}
-	ret*=(double)M;
+	//ret*=(double)pow(2, m);
 	return (ullint)ret;
 }
 

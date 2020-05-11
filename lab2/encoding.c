@@ -105,17 +105,19 @@ int main(int argc, char* argv[])
 			}
 		}
 		//printf("h");
-		if(licz <90 ) printf("after  licz:%i, lower:%lli, upper:%lli (%i %c)\n", licz, lower, upper, c, c);
-		//if(licz <70 && licz>50) printf("before licz:%i, lower:%f, upper:%f (%i %c)\n", licz, lower, upper, c, c);
+		if(licz <1465 && licz >1455) printf("before licz:%i, lower:%lli, upper:%lli (%i %c)\n", licz, lower, upper, c, c);
 		diff = upper-lower+1;
 		upper = lower+floor((f[c+1]*diff)/size)-1;
 		lower = lower+floor((f[c]*diff)/size);
+		if(licz <1465 && licz >1455) printf("after  licz:%i, lower:%lli, upper:%lli (%i %c)\n", licz, lower, upper, c, c);
 		
 		while(true)
 		{	
 			//printf("%i ",c);
 			//printf("l: %lli u: %lli\n",lower , upper);
-			//if(licz <70 && licz>50) printf("licz:%i, lower:%f, upper:%f, F[%i]:%f, F[%i]:%f\n", licz, lower, upper, c, F[c], c+1, F[c+1]);
+			ullint der = upper-lower+1;
+			if(licz <1465 && licz >1455) printf("licz:%i, lower:%lli, upper:%lli, F[%i]:%lli, F[%i]:%lli\n", licz, lower, upper, c, f[c], c+1, f[c+1]);
+			if(licz <1465 && licz >1455) printf("lower %lli, upper %lli\n", lower+(ullint)floor((f[c]*der)/size), lower+(ullint)floor((f[c+1]*der)/size)-1);
 			if(lower>=0 && upper<M/2)
 			{
 				file_bits[counter] = '0';
@@ -128,7 +130,7 @@ int main(int argc, char* argv[])
 				lower=2*lower;
 				upper=2*upper;
 				licznik = 0;
-				//if(licz <70 && licz>50) printf("while1\n");
+				if(licz <1465 && licz >1455) printf("while1\n");
 			}
 			else if(lower>=M/2 && upper<M)
 			{
@@ -142,14 +144,14 @@ int main(int argc, char* argv[])
 				lower=2*lower-M;
 				upper=2*upper-M;
 				licznik = 0;
-				//if(licz <70 && licz>50) printf("while2\n");
+				if(licz <1465 && licz >1455) printf("while2\n");
 			}
 			else if(lower>=M/4 && upper<3*M/4)
 			{
 				lower=2*lower-M/2;
 				upper=2*upper-M/2;				
 				licznik++;
-				//if(licz <70 && licz>50) printf("while3\n");
+				if(licz <1465 && licz >1455) printf("while3\n");
 			}
 			else 
 				break;			
