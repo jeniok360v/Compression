@@ -3,6 +3,7 @@
 #include <string>
 
 #include "fib.h"
-#include "elias.h"
+#include "gamma.h"
+#include "delta.h"
 
 #endif

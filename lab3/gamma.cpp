@@ -1,4 +1,3 @@
-#include "elias.h"
 #include <iostream>
 #include <string>
 
@@ -28,7 +27,6 @@ string gamma_encode(int n)
 
 void gamma_decode(int length, string str, int arr[])
 {
-	string temp[length];
 	int counter = 0;
 	
 	for(int i=0;i<length;i++)

@@ -1,5 +1,5 @@
-#ifndef ELIAS_H
-#define ELIAS_H
+#ifndef GAMMA_H
+#define GAMMA_H
 #include <string>
 
 std::string int2bin_str(int a);

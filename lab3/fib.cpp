@@ -1,8 +1,13 @@
-#include "fib.h"
 #include <iostream>
 #include <string>
 
 using namespace std;
+
+void fib(int amount, int arr[]);
+int encode_fib_count(int x);
+string fib_seq(int x);
+void fib_fill(int length, int arr[]);
+void decode_fib_str(int amount, string str, int arr[]);
 
 void fib(int amount, int arr[])
 {
