@@ -1,5 +1,3 @@
-#include "head.h"
-
 #ifndef FIB_H
 #define FIB_H
 #include <string>
