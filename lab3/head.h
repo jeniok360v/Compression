@@ -5,5 +5,6 @@
 #include "fib.h"
 #include "gamma.h"
 #include "delta.h"
+#include "omega.h"
 
 #endif

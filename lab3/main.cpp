@@ -21,5 +21,5 @@ int main()
 
 	//cout << bitset< 64 >( 12345 ).to_string() << endl;
 	//cout << int2bin_str(6) << endl;
-	//cout << delta_encode(2) << endl;
+	cout << endl << endl << omega_encode(137) << endl;
 }
