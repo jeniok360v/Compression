@@ -50,3 +50,4 @@ lab2/xml.xml
 *.txt
 lab2/preci.c
 lab2/utf8.c
+*.o
