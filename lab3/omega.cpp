@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
-#include "gamma.h"
+#include "helper.h"
 
 using namespace std;
 

@@ -2,6 +2,8 @@
 #define MY_FILE_H
 #include <string>
 
+#include "helper.h"
+
 #include "fib.h"
 #include "gamma.h"
 #include "delta.h"

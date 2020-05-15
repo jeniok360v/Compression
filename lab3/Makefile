@@ -1,8 +1,8 @@
 CC = gcc
 CXX = g++
 CXXFLAGS = -I.
-DEPS = fib.h gamma.h delta.h omega.h head.h encode.h decode.h
-OBJ = main.o fib.o delta.o omega.o gamma.o encode.o decode.o
+DEPS = fib.h gamma.h delta.h omega.h head.h encode.h decode.h helper.h
+OBJ = main.o fib.o delta.o omega.o gamma.o encode.o decode.o helper.o
 
 #for Linux
 #RM = rm -f

@@ -1,19 +1,10 @@
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
+#include "helper.h"
 
 using namespace std;
 
-string int2bin_str(int n)
-{
-	string str;
-    while(n!=0) 
-	{
-		str=(n%2==0 ?"0":"1")+str; 
-		n/=2;
-	}
-    return str;
-}
 
 string gamma_encode(int n)
 {
