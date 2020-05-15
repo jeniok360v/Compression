@@ -1,13 +1,14 @@
 #include <iostream>
 #include <string>
+#include <bits/stdc++.h>
 
 using namespace std;
 
 void fib(int amount, int arr[]);
 int encode_fib_count(int x);
-string fib_seq(int x);
+string fib_encode(int x);
 void fib_fill(int length, int arr[]);
-void decode_fib_str(int amount, string str, int arr[]);
+void fib_decode(int amount, string str, int arr[]);
 
 void fib(int amount, int arr[])
 {
@@ -40,7 +41,7 @@ int encode_fib_count(int x)
 	return counter;
 }
 
-string fib_seq(int x)
+string fib_encode(int x)
 {
 	int length = encode_fib_count(x);
 	int fib_num[length];
@@ -77,8 +78,9 @@ void fib_fill(int length, int arr[])
 	}
 }
 
-void decode_fib_str(int amount, string str, int arr[])
+vector<int> fib_decode(int amount, string str)
 {
+	vector<int> arr;
 	int counter = 0;
 	string temp[amount] = {};
 	
@@ -103,13 +105,15 @@ void decode_fib_str(int amount, string str, int arr[])
 	fib(max, fibs);	
 	for(int i=0;i<amount;i++)
 	{
+		arr.push_back(0);
 		for(int j=0;j<(int)temp[i].size();j++)
 		{
 			if(temp[i].at(j)=='1')
-			arr[i] += fibs[j];
+				arr.at(i) += fibs[j];
+			//arr[i] += fibs[j];
 		}
-	}	
-	return;
+	}
+	return arr;
 }
 
 

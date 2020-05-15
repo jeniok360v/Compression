@@ -1,8 +1,9 @@
 #ifndef DELTA_H
 #define DELTA_H
 #include <string>
+#include <bits/stdc++.h>
 
 std::string delta_encode(int n);
-void my_delta_decode(int length, std::string str, int arr[]);
+std::vector<int> my_delta_decode(int length, std::string str);
 
 #endif

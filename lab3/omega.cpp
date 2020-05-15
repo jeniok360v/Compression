@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <bits/stdc++.h>
 #include "gamma.h"
 
 using namespace std;
@@ -17,8 +18,9 @@ string omega_encode(int n)
 	return str;
 }
 
-void omega_decode(int length, string str, int arr[])
+vector<int> omega_decode(int length, string str)
 {
+	vector<int> arr;
 	int counter = 0;
 	for(int i=0;i<length;i++)
 	{
@@ -31,7 +33,8 @@ void omega_decode(int length, string str, int arr[])
 			counter+=temp+1;
 		}
 		counter++;
-		arr[i]=n;
+		arr.push_back(n);
 	}
+	return arr;
 }
 

@@ -1,8 +1,8 @@
 CC = gcc
 CXX = g++
 CXXFLAGS = -I.
-DEPS = fib.h gamma.h delta.h omega.h head.h
-OBJ = main.o fib.o delta.o omega.o gamma.o
+DEPS = fib.h gamma.h delta.h omega.h head.h encode.h decode.h
+OBJ = main.o fib.o delta.o omega.o gamma.o encode.o decode.o
 
 #for Linux
 #RM = rm -f
@@ -15,6 +15,9 @@ RM = del /Q /F
 
 main: $(OBJ)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
-	
+
 clean:
+	$(RM) $(OBJ)
+	
+full_clean:
 	$(RM) $(OBJ) main.exe main

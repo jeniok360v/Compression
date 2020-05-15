@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <bits/stdc++.h>
 #include "gamma.h"
 
 using namespace std;
@@ -12,8 +13,9 @@ string delta_encode(int n)
 	return str2+str1;
 }
 
-void my_delta_decode(int length, string str, int arr[])
+vector<int> my_delta_decode(int length, string str)
 {
+	vector<int> arr;
 	int counter = 0;
 	for(int i=0;i<length;i++)
 	{
@@ -25,9 +27,10 @@ void my_delta_decode(int length, string str, int arr[])
 		}
 		int bit_size = stoi(str.substr(counter,bits1+1), 0, 2);
 		counter += bits1+1;
-		arr[i]=stoi("1"+str.substr(counter, bit_size-1), 0, 2);
+		arr.push_back(stoi("1"+str.substr(counter, bit_size-1), 0, 2));
 		counter += bit_size-1;
 	}
+	return arr;
 }
 
 

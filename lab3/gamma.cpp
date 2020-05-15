@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -25,8 +26,9 @@ string gamma_encode(int n)
 	return str2+str1;
 }
 
-void gamma_decode(int length, string str, int arr[])
+vector<int> gamma_decode(int length, string str)
 {
+	vector<int> arr;
 	int counter = 0;
 	
 	for(int i=0;i<length;i++)
@@ -37,9 +39,10 @@ void gamma_decode(int length, string str, int arr[])
 			counter++;
 			bits++;		
 		}
-		arr[i]=stoi(str.substr(counter,bits+1), 0, 2);
+		arr.push_back(stoi(str.substr(counter,bits+1), 0, 2));
 		counter += bits +1;
 	}
+	return arr;
 }
 
 

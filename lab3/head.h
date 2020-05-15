@@ -7,4 +7,7 @@
 #include "delta.h"
 #include "omega.h"
 
+#include "encode.h"
+#include "decode.h"
+
 #endif
