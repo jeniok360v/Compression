@@ -82,28 +82,33 @@ vector<int> fib_decode(int amount, string str)
 {
 	vector<int> arr;
 	int counter = 0;
-	string temp[amount] = {};
+	vector<string> temp;
 	
 	int max=0;
-	for(int i=0;i<amount;i++)
+	int i = 0;
+	while(counter<str.length())
 	{
+		temp.push_back("");
 		int size=0;
 		while(str.at(counter)!='1' || str.at(counter+1)!='1')
 		{
 			size++;
-			temp[i] = temp[i]+str.at(counter);
+			temp.at(i) = temp.at(i)+str.at(counter);
 			counter++;
 		}
-		temp[i] += str.at(counter);
+		temp.at(i) += str.at(counter);
 		counter+=2;	
 		if(size+1>max)
 		{
 			max = size+1;
 		}
+		i++;
 	}
+	
+	int k=i;
 	int fibs[max];
 	fib(max, fibs);	
-	for(int i=0;i<amount;i++)
+	for(i=0;i<k;i++)
 	{
 		arr.push_back(0);
 		for(int j=0;j<(int)temp[i].size();j++)

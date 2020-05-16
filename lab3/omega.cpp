@@ -18,11 +18,11 @@ string omega_encode(int n)
 	return str;
 }
 
-vector<int> omega_decode(int length, string str)
+vector<int> omega_decode(string str)
 {
 	vector<int> arr;
 	int counter = 0;
-	for(int i=0;i<length;i++)
+	while(counter < str.length())
 	{
 		string str2="";
 		int n = 1;

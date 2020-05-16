@@ -4,6 +4,6 @@
 #include <bits/stdc++.h>
 
 std::string delta_encode(int n);
-std::vector<int> my_delta_decode(int length, std::string str);
+std::vector<int> my_delta_decode(std::string str);
 
 #endif

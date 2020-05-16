@@ -14,11 +14,11 @@ string delta_encode(int n)
 	return str2+str1;
 }
 
-vector<int> my_delta_decode(int length, string str)
+vector<int> my_delta_decode(string str)
 {
 	vector<int> arr;
 	int counter = 0;
-	for(int i=0;i<length;i++)
+	while(counter < str.length())
 	{
 		int bits1 = 0;
 		while(str.at(counter)=='0')

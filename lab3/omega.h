@@ -4,6 +4,6 @@
 #include <bits/stdc++.h>
 
 std::string omega_encode(int n);
-std::vector<int> omega_decode(int length, std::string str);
+std::vector<int> omega_decode(std::string str);
 
 #endif

@@ -17,12 +17,12 @@ string gamma_encode(int n)
 	return str2+str1;
 }
 
-vector<int> gamma_decode(int length, string str)
+vector<int> gamma_decode(string str)
 {
 	vector<int> arr;
 	int counter = 0;
 	
-	for(int i=0;i<length;i++)
+	while (counter < str.length())
 	{
 		int bits = 0;
 		while(str.at(counter)=='0')

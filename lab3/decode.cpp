@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
 
-
-
 using namespace std;
 
 string decode(vector<int> seq) 
