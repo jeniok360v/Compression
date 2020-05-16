@@ -1,8 +1,13 @@
 #include <string>
 #include <iostream>
 #include <bitset>
+#include <math.h>
+
+#define SIZE 256
 
 using namespace std;
+
+typedef unsigned long long int ullint;
 
 typedef enum 
 {
@@ -58,7 +63,23 @@ compressionType compType(string str)
 	return (compressionType)stoi(str.substr(3, 5), 0, 2);
 }
 
-
+float calculate_entr(int ilosc[SIZE], ullint amount)	//amount to liczba bajtow
+{
+	float entropy=0;
+	if(amount>0)
+	{
+		for (int i=0; i<SIZE;i++)
+		{
+			if(ilosc[i]>0)
+			{
+				entropy += ilosc[i]*(log2(ilosc[i]));
+			}
+		}
+		entropy= -entropy/(float)amount;
+		entropy+=log2((float)amount);
+	}
+	return entropy;
+}
 
 
 
