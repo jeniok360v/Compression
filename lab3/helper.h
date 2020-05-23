@@ -7,10 +7,10 @@
 typedef unsigned long long int ullint;
 typedef enum 
 {
-	fibonacci = 0,
-	gamma = 1,
-	delta = 2,
-	omega = 3
+	fibonac = 0,
+	gamm = 1,
+	delt = 2,
+	omeg = 3
 }compressionType;
 
 std::string int2bin_str(int a);

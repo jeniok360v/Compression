@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	if(argc == 2)
 	{
 		input = fopen(argv[1], "rb");
-		compType = omega;	
+		compType = omeg;	
 	}	
 	else if(argc == 3)
 	{
